@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 * 		   add_user_lookup
 * 		   edit_user_lookup
 * 		   get_modal
-* 		   is_unique_es
+* 		   is_unique
 * 		   get_user_by_id_lookup
 * 		   delete_user_by_id_lookup
 */
@@ -18,9 +18,7 @@ class User extends PD_Photo
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('elasticsearch');
 		$this->load->library('layouts');
-		$this->load->library('ajax_pagination');
 		$this->load->model('admin/user_model');
 		$this->load->model('admin/role_model');
 	}
@@ -43,6 +41,7 @@ class User extends PD_Photo
 
 	public function index()
 	{
+		$this->unset_user_search_filter();
 		if($this->input->is_ajax_request()) {
 			$this->search_user_lookup();
 		}
@@ -54,13 +53,11 @@ class User extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = 6;
-//		$config['per_page'] = 1;
-		$config["uri_segment"] = 4;
+		$config['per_page'] = USERS_PER_PAGE;
+		$config["uri_segment"] = URI_SEGMENT;
 
-		$users = $this->fetch_users_by_elasticsearch($config["per_page"], $current_page);
-
-		$config["total_rows"] = !empty($users['total']) ? $users['total'] : 0;
+		$data["users"] = $this->fetch_users_lookup($config["per_page"], $current_page);
+		$config["total_rows"] = $this->user_model->record_count();
 
 		$config["num_links"] = 1;
 		$config['full_tag_open'] = '<ul class="pagination">';
@@ -77,8 +74,6 @@ class User extends PD_Photo
 		$config['cur_tag_close'] = "</b></span></li>";
 
 		$this->pagination->initialize($config);
-
-		$data["users"] = !empty($users['hits']) ? $users['hits'] : array();
 
 		$data["links"] = $this->pagination->create_links();
 
@@ -98,15 +93,16 @@ class User extends PD_Photo
 	 */
 	public function add_user_lookup()
 	{
+		$this->unset_user_search_filter();
+
 		$this->layouts->set_title('Add user');
 
 		/**
 		 * if its an ajax call then, set post data so
 		 * post data will be available for validation.
 		 */
-
 		if ($this->input->is_ajax_request()) {
-			$data = array();
+		    $data = array();
 			foreach ($_POST as $key => $value) {
 				if ($key == 'add_user') {
 					continue;
@@ -114,12 +110,10 @@ class User extends PD_Photo
 
 				$data[$key] = (!empty($this->input->post($key)) ? $this->input->post($key) : '');
 			}
-
 			$this->form_validation->set_data($data);
 		}
 
 		// First Name
-
 		$this->form_validation->set_rules(
 
 				'first_name', 'First Name',
@@ -131,7 +125,7 @@ class User extends PD_Photo
 						'alpha' => 'Only alphabets are allowed'
 				)
 		);
-
+        
 		// Middle Name
 
 		$this->form_validation->set_rules(
@@ -164,7 +158,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'user_name', 'User Name',
-				'trim|required|min_length[2]|max_length[50]|alpha_numeric|callback_is_unique_es[user_name]',
+				'trim|required|min_length[2]|max_length[50]|alpha_numeric|is_unique[user.user_name]',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -178,7 +172,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'email', 'Email',
-				'trim|required|max_length[70]|valid_email|callback_is_unique_es[email]',
+				'trim|required|max_length[70]|valid_email|is_unique[user.email]',
 				array(
 						'required' => '%s is required',
 						'max_length' => '%s should be at most %s chars',
@@ -192,7 +186,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'mobile_number', 'Mobile Number',
-				'trim|required|min_length[11]|max_length[11]|is_natural|callback_is_unique_es[mobile_number]',
+				'trim|required|min_length[11]|max_length[11]|is_natural|is_unique[user.mobile_number]',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -249,7 +243,6 @@ class User extends PD_Photo
 						'alpha_dash' => 'Only alpha-numeric characters, underscores and hypens are allowed'
 				)
 		);
-
 		if ($this->form_validation->run() === FALSE) // Validation fails
 		{
 			/**
@@ -267,7 +260,6 @@ class User extends PD_Photo
 
 					$errors[$key] = (!empty(form_error($key)) ? form_error($key) : '');
 				}
-
 				echo json_encode($errors);
 			} else // if not an ajax call
 			{
@@ -284,7 +276,6 @@ class User extends PD_Photo
 				$image_thumb = USER_IMAGE_UPLOAD_PATH . '/THUMB_' . $image;
 				$profile_image = USER_IMAGE_UPLOAD_PATH . '/PROFILE_IMAGE_' . $image;
 				$image_dest = USER_IMAGE_UPLOAD_PATH . '/IMAGE_' . $image;
-
 				$this->make_thumb(USER_IMAGE_UPLOAD_PATH . '/' . $image, $image_thumb, 30);
 				$this->make_thumb(USER_IMAGE_UPLOAD_PATH . '/' . $image, $profile_image, 320);
 				$this->make_thumb(USER_IMAGE_UPLOAD_PATH . '/' . $image, $image_dest, 1024);
@@ -301,7 +292,7 @@ class User extends PD_Photo
 				$profile_image_name = '';
 			}
 
-			if ($this->user_model->insert_user($image, $profile_image_name, $image_thumb_name)) // insert into db
+			if ($this->user_model->insert_user($image_name, $profile_image_name, $image_thumb_name)) // insert into db
 			{
 				$this->session->set_flashdata('success_message', 'User ' . ucfirst($this->input->post('first_name')) . ' ' . ucfirst($this->input->post('middle_name')) . ' ' . ucfirst($this->input->post('last_name')) . ' has been successfully added!');
 				unset($_POST);
@@ -320,6 +311,8 @@ class User extends PD_Photo
 	 */
 	public function edit_user_lookup($id)
 	{
+		$this->unset_user_search_filter();
+
 		$this->layouts->set_title('Edit user');
 
 		/**
@@ -386,7 +379,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'user_name', 'User Name',
-				'trim|required|min_length[2]|max_length[50]|alpha_numeric|callback_edit_unique_es[user_name.' . $id . ']',
+				'trim|required|min_length[2]|max_length[50]|alpha_numeric|callback_edit_unique[user.user_name.'. $id .']',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -400,7 +393,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'email', 'Email',
-				'trim|required|min_length[15]|max_length[70]|valid_email|callback_edit_unique_es[email.' . $id . ']',
+				'trim|required|min_length[15]|max_length[70]|valid_email|callback_edit_unique[user.email.'. $id .']',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -414,7 +407,7 @@ class User extends PD_Photo
 		$this->form_validation->set_rules(
 
 				'mobile_number', 'Mobile Number',
-				'trim|required|min_length[11]|max_length[11]|is_natural|callback_edit_unique_es[mobile_number.' . $id . ']',
+				'trim|required|min_length[11]|max_length[11]|is_natural|callback_edit_unique[user.mobile_number.'. $id .']',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -443,9 +436,8 @@ class User extends PD_Photo
 		);
 
 		$data['roles'] = $this->role_model->get_user_roles();
-		$record = $this->get_user_by_id_lookup($id, 'edit_user'); // TRUE to get all items for edit purpose not full_name etc
-		$data['record'] = $record;
-
+		$record = $this->get_user_by_id_lookup($id); // TRUE to get all items for edit purpose not full_name etc
+		$data['user'] = $record;
 		if ($this->form_validation->run() === FALSE) // Validation fails
 		{
 			/**
@@ -472,7 +464,6 @@ class User extends PD_Photo
 			$image = $_FILES['image']['name'];
 			if(!empty($image))
 			{
-//				$this->delete_picture($id, 'user', USER_IMAGE_UPLOAD_PATH, $record);
 				$this->delete_picture(USER_IMAGE_UPLOAD_PATH, $record);
 
 				// Passing 1: image name, 2: image upload path and 3: file name attribute value
@@ -495,21 +486,14 @@ class User extends PD_Photo
 			}
 			else
 			{
-				$record = current($record);
-				$image_name = custom_echo($record, 'image', 'no_case_change');
-				$profile_image_name = custom_echo($record, 'profile_image', 'no_case_change');
-				$image_thumb_name = custom_echo($record, 'thumbnail', 'no_case_change');
+				$image_name = $record['image'];
+				$profile_image_name = $record['profile_image'];
+				$image_thumb_name = $record['thumbnail'];
 			}
 
-			$source = '"_source": {
-			"includes": [ "joined_date"]
-			},';
+			$user = $this->get_user_by_id_lookup($id);
 
-			$user = $this->get_user_by_id_lookup($id, 'only_joined_date', $source);
-
-			$joined_date = custom_echo($user[0], 'joined_date');
-
-			if($this->user_model->update_user($id, $image_name, $image_thumb_name, $profile_image_name, $joined_date))
+			if($this->user_model->update_user($id, $image_name, $image_thumb_name, $profile_image_name))
 			{
 				$this->session->set_flashdata('success_message', 'User ' . ucfirst($this->input->post('first_name')) . ' ' .
 						(!empty($this->input->post('middle_name')) ? ' ' . ucfirst($this->input->post('middle_name')) : '')
@@ -526,8 +510,9 @@ class User extends PD_Photo
 	 */
 	public function get_modal($id)
 	{
-		$data['record'] = $this->get_user_by_id_lookup($id);
+		$this->unset_user_search_filter();
 
+		$data['user'] = $this->get_user_by_id_lookup($id, TRUE);
 		$this->load->view('templates/admin/user_modal', $data);
 	}
 
@@ -540,6 +525,8 @@ class User extends PD_Photo
 	 */
 	public function change_password_lookup()
 	{
+		$this->unset_user_search_filter();
+
 		$this->layouts->set_title('Change Password');
 
 		/**
@@ -641,7 +628,7 @@ class User extends PD_Photo
 	}
 
 	/**
-	 * [is_unique_es It's a callback function that is called in edit_user_lookup
+	 * [is_unique It's a callback function that is called in edit_user_lookup
 	 * validation it checks if same attribute data exists other than the current
 	 * current record than returns FALSE. If does not exists it returns TRUE]
 	 * @param  [string] $value  [User entered value e.g. in case of email validation
@@ -650,9 +637,9 @@ class User extends PD_Photo
 	 * @return [type]  [if same data exists other than current record then, returns
 	 * FALSE. If it doesn't exists other than current record then, returns TRUE.]
 	 */
-	public function is_unique_es($value, $field)
+	public function is_unique($value, $field)
 	{
-		$this->form_validation->set_message('is_unique_es',
+		$this->form_validation->set_message('is_unique',
 				'The %s is not available');
 
 		$query = '{
@@ -670,40 +657,34 @@ class User extends PD_Photo
 		return !empty($user['hits']['hits']) ? FALSE : TRUE;
 	}
 
-	/**
-	 * [edit_unique_es It's a callback function that is called in edit_user_lookup
-	 * validation it checks if same attribute data exists other than the current
-	 * current record than returns FALSE. If does not exists it returns TRUE]
-	 * @param  [string] $value  [User entered value e.g. in case of email validation
-	 * sheryarahmed007@gmail.com]
-	 * @param  [string] $params [table.attribute.id e.g. user.email.3]
-	 * @return [type]  [if same data exists other than current record then, returns
-	 * FALSE. If it doesn't exists other than current record then, returns TRUE.]
-	 */
-	public function edit_unique_es($value, $params)
-	{
-		list($field, $id) = explode(".", $params, 2);
+    /**
+     * [edit_unique It's a callback function that is called in edit_user_lookup
+     * validation it checks if same attribute data exists other than the current
+     * current record than returns FALSE. If does not exists it returns TRUE]
+     * @param  [string] $value  [User entered value e.g. in case of email validation
+     * sheryarahmed007@gmail.com]
+     * @param  [string] $params [table.attribute.id e.g. user.email.3]
+     * @return [type]  [if same data exists other than current record then, returns
+     * FALSE. If it doesn't exists other than current record then, returns TRUE.]
+     */
+    public function edit_unique($value, $params)
+    {
+        $this->form_validation->set_message('edit_unique',
+            'The %s is already being used by another account.');
+        list($table, $field, $id) = explode(".", $params, 3);
 
-		$this->form_validation->set_message('edit_unique_es',
-				'The %s is not available');
+        $query = $this->db->select($field)->from($table)
+            ->where($field, $value)->where('id !=', $id)->limit(1)->get();
 
-		$query = '{
-		  "query": {
-			"bool" : {
-			  "must" : {
-				"term" : { "' . $field . '" : "' . strtolower($value) . '" }
-			  },
-			  "must_not" : {
-				"term" : { "id" : ' . $id . '}
-			  }
-			}
-		  }
-		}';
-
-		$user = $this->elasticsearch->advancedquery('users', 'user', $query);
-
-		return !empty($user['hits']['hits']) ? FALSE : TRUE;
-	}
+        if ($query->row())
+        {
+            return FALSE;
+        }
+        else
+        {
+            return TRUE;
+        }
+    }
 
 	/**
 	 * [current_password_match It's a callback function that is called in current_password_match
@@ -715,6 +696,8 @@ class User extends PD_Photo
 	 */
 	public function current_password_match($form_password, $params)
 	{
+		$this->unset_user_search_filter();
+
 		$current_user_id = array_column($this->session->userdata['admin_record'], 'id')[0];
 
 		$this->form_validation->set_message('current_password_match',
@@ -758,72 +741,22 @@ class User extends PD_Photo
 	 * @return [array] [One specific user record who's $id is passed]
 	 */
 
-	public function get_user_by_id_lookup($id, $method = 'get_user', $source = NULL)
+	public function get_user_by_id_lookup($id, $return_role_name=FALSE)
 	{
-
-		if($method == 'edit_user' && is_null($source)) {
-			$source = '"_source": {
-				"includes": [ "id", "first_name", "middle_name", "last_name", "user_name", "email", "mobile_number", "image", "profile_image", "thumbnail", "role_id"]
-				},';
-		}
-		if($method != 'edit_user' && is_null($source)){
-			$source = '"_source": {
-				"includes": [ "id", "full_name", "user_name", "email", "mobile_number", "profile_image", "role", "joined_date", "updated_date"]
-				},';
-		}
-
-		$query = '
-		{ ' .
-
-			$source
-
-		. '"query": {
-				"query_string":{
-					"query": '. $id .',
-					"fields": ["id"]
-				}
-			}
-		}';
-
-		$user = $this->elasticsearch->advancedquery('users', 'user', $query);
-
-		$user = $user['hits']['hits'];
-
+		$this->unset_user_search_filter();
+        $user = $this->user_model->get_user_by_id_lookup($id, $return_role_name);
 		return $user;
 	}
 
 	public function user_full_name_autocomplete()
 	{
 		$full_name = trim(strtolower($this->input->post('full_name')));
-		$source = '"_source": {
-				"includes": [ "full_name"]
-				},';
 
-		$query = '
-		{ ' .
-
-			$source
-
-		. '
-			"from" : 0, "size" : 6,
-				"query": {
-					"query_string":{
-						"query": '. '"*'.$full_name.'*"' .',
-						"fields": ["full_name"],
-						"default_operator": "AND"
-					}
-				}
-			}';
-
-		$users = $this->elasticsearch->advancedquery('users', 'user', $query);
-
-		$users = $users['hits']['hits'];
-
-		$full_names = [];
+		$users = $this->user_model->user_full_name_autocomplete($full_name);
 
 		if(!empty($users)) {
 			foreach($users as $user) {
-				$full_names[] = custom_echo($user, 'full_name');
+				$full_names[] = ucwords($user['full_name']);
 			}
 		} else {
 			$full_names[] = 'No Results Found';
@@ -842,17 +775,13 @@ class User extends PD_Photo
 
 	public function delete_user_by_id_lookup($id)
 	{
-		$source = '"_source": {
-			"includes": ["profile_image", "thumbnail", "image"]
-			},';
+		$this->unset_user_search_filter();
 
-		$record = $this->get_user_by_id_lookup($id, 'edit_user', $source);
+		$record = $this->get_user_by_id_lookup($id);
 
 		$this->delete_picture(USER_IMAGE_UPLOAD_PATH, $record);
 
 		if ($this->user_model->delete_user($id)) {
-			$this->elasticsearch->delete('users', 'user', $id);
-			$this->elasticsearch->refresh_index_type('users', 'user', $id);
 			$this->session->set_flashdata('delete_message', 'Record has been successfully deleted!');
 			redirect('/admin/user/');
 		}
@@ -908,17 +837,21 @@ class User extends PD_Photo
 
 	public function search_user_lookup() {
 
+		$this->get_user_search_filter();
+
+		$this->set_user_search_filter();
+
 		$current_page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
 
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = 4;
-		$config["uri_segment"] = 4;
+		$config['per_page'] = USERS_PER_PAGE;
+		$config["uri_segment"] = URI_SEGMENT;
 
-		$users = $this->fetch_users_by_elasticsearch($config["per_page"], $current_page);
+		$data["users"] = $this->fetch_users_lookup($config["per_page"], $current_page);
 
-		$config["total_rows"] = !empty($users['total']) ? $users['total'] : 0;
+		$config["total_rows"] = $this->users_count();
 
 		$config["num_links"] = 1;
 		$config['full_tag_open'] = '<ul class="pagination">';
@@ -934,19 +867,20 @@ class User extends PD_Photo
 		$config["cur_tag_open"] = "<li class='active'><a href='#'>";
 		$config["cur_tag_close"] = "</a></li>";
 
-//		$config['cur_tag_open'] = "<li><span><b>";
-//		$config['cur_tag_close'] = "</b></span></li>";
-
 		$this->pagination->initialize($config);
 
 		$data["links"] = $this->pagination->create_links();
 
-		$data["users"] = !empty($users['hits']) ? $users['hits'] : array();
-
 		$this->load->view('templates/admin/search_users', $data);
 	}
 
-	public function fetch_users_by_elasticsearch($per_page = 8, $current_page = 0)
+	/**
+	 * @param int $per_page
+	 * @param int $current_page
+	 * @return mixed Users JSON Object
+	 *
+	 */
+	public function fetch_users_lookup($per_page, $current_page)
 	{
 		$role_id = isset($_POST['role_id']) && is_numeric($_POST['role_id']);
 		$full_name = isset($_POST['full_name']) && !empty($_POST['full_name']);
@@ -954,62 +888,120 @@ class User extends PD_Photo
 		$full_name_ac = strtolower($this->input->post('full_name'));
 
 		if($role_id) {
-			$query_string = '"query": '. $role_ac_id .',
-						"fields": ["role_id"]';
+			$users = $this->user_model->fetch_users(array(
+				'per_page' => $per_page,
+				'current_page' => $current_page,
+				'role_id' => $role_ac_id
+				)
+			);
 		}
 
 		if($full_name) {
-			$query_string = '"query": "*'. $full_name_ac . '*",
-						"fields": ["full_name"]';
+			$users = $this->user_model->fetch_users(array(
+				'per_page' => $per_page,
+				'current_page' => $current_page,
+				'full_name' => $full_name_ac
+				)
+			);
 		}
 
 		if($role_id && $full_name) {
-			$query_string =	'"bool": {
-				"must" : [
-			  	{
-				  "term": {
-				  "role_id": ' . $role_ac_id . '
-			   	}
-			 },
-			 {
-				"query_string":{
-				"query": '. '"*'.$full_name_ac.'*"' .',
-					"fields": ["full_name"]
-				}
-			}
-		   ]
-		 }';
-
+			$users = $this->user_model->fetch_users(array(
+				'per_page' => $per_page,
+				'current_page' => $current_page,
+				'role_id' => $role_ac_id,
+				'full_name' => $full_name_ac
+				)
+			);
 		}
 
+		if(!$this->input->is_ajax_request()) {
+			$users = $this->user_model->fetch_users(array(
+				'per_page' => $per_page,
+				'current_page' => $current_page
+				)
+			);
+		}
 
-		$query = '
-				{
-					"from" : ' . $current_page . ', "size" : ' . $per_page;
+		if(isset($users)) {
+			return $users;
+		}
+	}
+
+	/**
+	 * @return mixed Users count
+	 *
+	 */
+	public function users_count()
+	{
+		$role_id = isset($_POST['role_id']) && is_numeric($_POST['role_id']);
+		$full_name = isset($_POST['full_name']) && !empty($_POST['full_name']);
+		$role_ac_id = $this->input->post('role_id');
+		$full_name_ac = strtolower($this->input->post('full_name'));
+
+		if($role_id) {
+			$users = $this->user_model->record_count(array(
+				'role_id' => $role_ac_id
+				)
+			);
+		}
+
+		if($full_name) {
+			$users = $this->user_model->record_count(array(
+				'full_name' => $full_name_ac
+				)
+			);
+		}
 
 		if($role_id && $full_name) {
-			$query .= ',"query": {
-				' . $query_string .  '
-				}';
-		}else {
-
-			if($role_id || $full_name) {
-				$query .= ',"query": {
-				"query_string":{
-					' . $query_string . '
-					}
-				}';
-			}
+			$users = $this->user_model->record_count(array(
+				'role_id' => $role_ac_id,
+				'full_name' => $full_name_ac
+				)
+			);
 		}
 
+		if(!$this->input->is_ajax_request()) {
+			$users = $this->user_model->record_count();
+		}
 
-		$query .= '}';
+		if(isset($users)) {
+			return $users;
+		}
+	}
 
-		$users = $this->elasticsearch->advancedquery('users', 'user', $query);
+	public function set_user_search_filter() {
+		$role_id = trim($this->input->post('role_id'));
+		$full_name = trim($this->input->post('full_name'));
+		if(!empty($role_id) || !empty($full_name)) {
+			$this->session->set_userdata(array(
+					'role_id' 	=> $this->input->post('role_id'),
+					'full_name' => $this->input->post('full_name')
+				)
+			);
+		}
+	}
 
-		$users = !empty($users['hits']) ? $users['hits'] : array();
+	public function get_user_search_filter() {
 
-		return $users;
+		$session_full_name = $this->session->userdata('full_name');
+		$full_name = $this->input->post('full_name');
+		$session_role_id = $this->session->userdata('role_id');
+		$role_id = $this->input->post('role_id');
 
+		if(empty($full_name)) {
+			$_POST['full_name'] = $session_full_name;
+		}
+
+		if(empty($role_id)) {
+			$_POST['role_id'] = $session_role_id;
+		}
+	}
+
+	public function unset_user_search_filter() {
+		$this->session->unset_userdata(array(
+				'role_id', 'full_name'
+			)
+		);
 	}
 }

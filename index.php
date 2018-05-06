@@ -55,6 +55,12 @@
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
+	/**
+	 * Custom Config File
+	 */
+
+	require_once 'config.php';
+
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING

@@ -14,7 +14,6 @@ defined('DS') OR define('DS', DIRECTORY_SEPARATOR);
 | 
 */
 
-defined('BASE_URL') OR define('BASE_URL','http://'.$_SERVER['HTTP_HOST'].'/easy-shop/');
 defined('ADMIN_ASSETS') OR define('ADMIN_ASSETS', BASE_URL . 'assets/admin/');
 
 /*
@@ -27,7 +26,6 @@ defined('ADMIN_ASSETS') OR define('ADMIN_ASSETS', BASE_URL . 'assets/admin/');
 | 
 */
 
-defined('BASE_URL') OR define('BASE_URL','http://'.$_SERVER['HTTP_HOST'].'/easy-shop/');
 defined('FRONT_END_ASSETS') OR define('FRONT_END_ASSETS', BASE_URL . 'assets/front_end/');
 
 /*

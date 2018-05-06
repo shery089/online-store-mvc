@@ -661,3 +661,19 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.no-padding {
+    padding: 0 !important;
+}
+
+.big-loader-img {
+    width: 120px;
+}
+
+.img-centered {
+    margin: 0 auto;
+}

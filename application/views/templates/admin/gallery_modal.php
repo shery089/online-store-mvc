@@ -17,10 +17,10 @@
             </div>
 
             <!-- modal-body -->
-            <div class="modal-body">
+            <div class="modal-body no-padding">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 no-padding">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-condensed table-striped admin-table">
                                     <col width="40">
@@ -30,11 +30,11 @@
                                     <col width="95">
                                     <thead>
                                         <tr>
-                                            <th>Thumbnail</th>
-                                            <th>Title</th>
-                                            <th>Uploaded By</th>
-                                            <th>Uploaded Date</th>
-                                            <th>Updated Date</th>
+                                            <th class="text-center">Thumbnail</th>
+                                            <th class="text-center">Title</th>
+                                            <th class="text-center">Uploaded By</th>
+                                            <th class="text-center">Uploaded Date</th>
+                                            <th class="text-center">Updated Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>

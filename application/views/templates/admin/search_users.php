@@ -23,15 +23,15 @@
 				    <tbody>
 					<?php foreach ($users as $user):?>
 						<tr>
-				   			<td><?= custom_echo($user, 'full_name'); ?></td>
-				   			<td><?= custom_echo($user, 'user_name'); ?></td>
-				   			<td><?= custom_echo($user, 'email'); ?></td>
-				   			<td><?= custom_echo($user, 'mobile_number'); ?></td>
-				   			<td><?= custom_echo($user, 'role'); ?></td>
+							<td><?= ucwords($user['full_name']); ?></td>
+							<td><?= ucwords($user['user_name']); ?></td>
+							<td><?= $user['email']; ?></td>
+							<td><?= $user['mobile_number']; ?></td>
+							<td><?= ucwords($user['role']); ?></td>
 				   			<td>
-				   				<a href="<?= base_url('admin/user/edit_user_lookup/') . '/' . custom_echo($user, 'id'); ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-								<a href="javascript:void(0)" id="delete_<?= custom_echo($user, 'id'); ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
-				   				<a href="javascript:void(0)" id="view_<?= custom_echo($user, 'id'); ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
+				   				<a href="<?= base_url('admin/user/edit_user_lookup/') . '/' . $user['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
+								<a href="javascript:void(0)" id="delete_<?= $user['id']; ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
+				   				<a href="javascript:void(0)" id="view_<?= $user['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   			</td>
 				   		</tr>
 					<?php endforeach; ?>

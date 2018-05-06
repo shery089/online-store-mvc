@@ -5,7 +5,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title">Login with</h4>
         </div>
-        <div class="modal-body" style="padding-top: 0;">
+        <div class="modal-body no-padding" style="padding-top: 0;">
             <div class="box">
                  <div class="content">
                     <!-- <div class="social">

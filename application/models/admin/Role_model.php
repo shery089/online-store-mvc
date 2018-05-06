@@ -89,11 +89,22 @@
          * attibutes are retrieved for display/view purpose]
          * @return [array] [Role record is returned]
          */
-        public function get_role_by_id($id)
+        public function get_role_by_id($id, $specific_fields=FALSE)
         {
-            $q = $this->db->get_where('user_role', array('id' => $id)); 
-            
-            return $q->result_array()[0];
+            if($specific_fields) {
+                $this->db->select('user_role.name');
+            }
+            else {
+                $this->db->select('user_role.id, user_role.name');
+            }
+            $this->db->from('user_role');
+            $this->db->where(array('id' => $id));
+            $q = $this->db->get();
+
+            if($q->num_rows() > 0) {
+                return $specific_fields == TRUE ? $q->result_array()[0]['name'] : $q->result_array()[0];
+            }
+                return array();
         }
 
         /**

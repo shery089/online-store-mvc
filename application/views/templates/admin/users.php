@@ -27,13 +27,7 @@
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
-<!---->
-<!--			<div class="col-lg-4">-->
-<!--				<div class="form-group custom-search-form">-->
-<!--					<input type="text" id="search_doctor_name" name="search_doctor_name" class="form-control" placeholder="Doctor Name">-->
-<!--				</div>-->
-<!--			</div>-->
-			<div class="col-lg-4"></div>
+			<div class="col-lg-3"></div>
 			<div class="col-lg-4">
 				<div class="form-group custom-search-form">
 					<div class="form-group">
@@ -45,8 +39,6 @@
 							'id'            => 'search_by_user_role',
 							'title'         => 'Choose a Role'
 						);
-
-						$options[''] = '';
 
 						foreach ($roles as $role)
 						{
@@ -73,10 +65,15 @@
 				</div>
 			</div>
 
+			<div class="col-lg-1">
+				<a href="<?= base_url('admin/user') ?>" class="btn btn-warning" type="button">Reset <i class="fa fa-undo"></i></a>
+			</div>
+
+			<img id="spinner" class="hide" src="<?= ADMIN_IMAGES_PATH . 'ajax_clock_small.gif' ?>">
+
 			<!-- Add User Button -->
 			<div class="form-group text-left" style="margin-top: 55px">
 				<a href="<?= site_url('admin/user/add_user_lookup'); ?>" class="btn btn-primary">Add New</a>
-				<a href="<?= site_url('admin/user/indice_user_elastic_search_lookup'); ?>" class="btn btn-warning pull-right">Indice User Elastic Search</a>
 			</div>
 
      		<?php if(!empty($users)): ?>
@@ -104,15 +101,15 @@
 				    <tbody>
 					<?php foreach ($users as $user):?>
 						<tr>
-				   			<td><?= custom_echo($user, 'full_name'); ?></td>
-				   			<td><?= custom_echo($user, 'user_name'); ?></td>
-				   			<td><?= custom_echo($user, 'email'); ?></td>
-				   			<td><?= custom_echo($user, 'mobile_number'); ?></td>
-				   			<td><?= custom_echo($user, 'role'); ?></td>
+				   			<td><?= ucwords($user['full_name']); ?></td>
+				   			<td><?= ucwords($user['user_name']); ?></td>
+				   			<td><?= ucwords($user['email']); ?></td>
+				   			<td><?= ucwords($user['mobile_number']); ?></td>
+				   			<td><?= ucwords($user['role']); ?></td>
 				   			<td>
-				   				<a href="<?= base_url('admin/user/edit_user_lookup/') . '/' . custom_echo($user, 'id'); ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-								<a href="javascript:void(0)" id="delete_<?= custom_echo($user, 'id'); ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
-				   				<a href="javascript:void(0)" id="view_<?= custom_echo($user, 'id'); ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
+				   				<a href="<?= base_url('admin/user/edit_user_lookup/') . '/' . $user['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
+								<a href="javascript:void(0)" id="delete_<?= $user['id']; ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
+				   				<a href="javascript:void(0)" id="view_<?= $user['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   			</td>
 				   		</tr>
 					<?php endforeach; ?>
@@ -124,6 +121,9 @@
 	  			<h3 class="text-center">Sorry No Record Found!</h3>
 	  		<?php endif; ?>
 			</div><!--	searched_results	-->
+			<div class="text-center">
+				<img id="loading" style="display: none;" class="big-loader-img" src="<?= ADMIN_IMAGES_PATH . 'big_loading.gif' ?>" />
+			</div>
 			</div>
 		</div>
     </div>

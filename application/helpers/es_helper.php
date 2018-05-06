@@ -70,7 +70,6 @@ function currentYear(){
 }
 
 function custom_echo($arr, $col, $case_change = '') {
-
     return $case_change == 'no_case_change' ? (array_column($arr, $col)[0]) : ucwords(entity_decode(array_column($arr, $col)[0]));
 }
 

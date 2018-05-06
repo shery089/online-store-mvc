@@ -75,11 +75,11 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'easy-shop',
-	'dbdriver' => 'mysqli',
+	'hostname' => DB_HOST,
+	'username' => DB_USER,
+	'password' => DB_PASSWORD,
+	'database' => DB_NAME,
+	'dbdriver' => DB_DRIVER,
 	'dbprefix' => '',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),

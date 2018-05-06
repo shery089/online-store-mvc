@@ -263,6 +263,10 @@
         </div>
         <br>
 
+        <!-- Spinner -->
+
+        <img id="spinner" class="hide" src="<?= ADMIN_IMAGES_PATH . 'ajax_clock_small.gif' ?>">
+
         <!-- Add Button -->
 
         <div class="col-lg-12">

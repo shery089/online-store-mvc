@@ -1,5 +1,5 @@
 /*
- * Easy Shop Main JS file
+ * Inventory Management System Main JS file
  * Author: Sheryar Ahmed
  * Email: sheryarahmed@gmail.com
  * Created On: 02/12/2017 mm-dd-yyyy
@@ -12,7 +12,7 @@
 
 $(function() {
     /*    CKEDITOR.replace('introduction', {
-     filebrowserUploadUrl: "http://localhost/easy-shop/assets/admin/images/upload.php"
+     filebrowserUploadUrl: "http://localhost/assets/admin/images/upload.php"
      }
      );*/
 
@@ -20,27 +20,28 @@ $(function() {
     // $.removeCookie("user", { path: '/' });
 
     var url = window.location;
-    // http://localhost/easy-shop/admin/user/add_user_lookup
+    // http://localhost/admin/user/add_user_lookup
 
     var host = window.location.hostname;
     // localhost
 
     var pathname = window.location.pathname;
-    // /easy-shop/admin/user/add_user_lookup
+    // /admin/user/add_user_lookup
 
     var origin = window.location.origin;
     // http://localhost
 
     var path_parts = pathname.split('/');
-    var url_parts = path_parts[1] + '/' + path_parts[2] + '/' + path_parts[3]
-    // easy-shop/admin/user
+    var url_parts = path_parts[1] + '/' + path_parts[2] + '/'
+    // ims/admin/user
 
     var active_half_url = origin + '/' + url_parts;
-
     // adds active class to selected side bar li element
     $('#side-menu a[href="'+ active_half_url +'"]').parent().addClass('active');
 
     $('#side-menu').metisMenu();
+
+    var loading = $('#loading');
 
     if($(this).width() < 400) {
         $("a:contains('Add New')").parent().toggleClass('text-left').toggleClass('text-center')
@@ -115,7 +116,7 @@ $(function() {
         CKEDITOR.replace('column');
     }
 
-    if(path_parts[3] == 'columnist')
+    if(path_parts[2] == 'columnist')
     {
         var dateToday = new Date();
         var yrCurrent = dateToday.getFullYear();
@@ -123,13 +124,13 @@ $(function() {
     }
 
     var active_half_url = origin + '/' + url_parts;
-    // http://localhost/easy-shop/admin/user
+    // http://localhost/admin/user
 
     // adds active class to selected page in bootstrap pagination
     $('ul.pagination').find('b').closest('li').addClass('active');
 
-    var base_url = origin + '/easy-shop';
-    // "http://localhost/easy-shop"
+    var base_url = origin;
+    // "http://local.ims.com:8081"
 
     var admin_assets = base_url + '/admin/';
 
@@ -173,7 +174,7 @@ $(function() {
      */
     $('#edit_gallery_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_gallery_form', '/easy-shop/admin/gallery');
+        createOrUpdateByAjax('edit_gallery_form', '/admin/gallery');
     });
 
 
@@ -183,7 +184,7 @@ $(function() {
      */
     $('#add_newspaper_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_newspaper_form', '/easy-shop/admin/newspaper/');
+        createOrUpdateByAjax('add_newspaper_form', '/admin/newspaper/');
     });
 
     /**
@@ -192,7 +193,7 @@ $(function() {
      */
     $('#edit_newspaper_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_newspaper_form', '/easy-shop/admin/newspaper/');
+        createOrUpdateByAjax('edit_newspaper_form', '/admin/newspaper/');
     });
 
     /**
@@ -201,7 +202,7 @@ $(function() {
      */
     $('#add_role_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_role_form', '/easy-shop/admin/role/');
+        createOrUpdateByAjax('add_role_form', '/admin/role/');
     });
 
     /**
@@ -210,7 +211,7 @@ $(function() {
      */
     $('#edit_role_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_role_form', '/easy-shop/admin/role/');
+        createOrUpdateByAjax('edit_role_form', '/admin/role/');
     });
 
     /**
@@ -219,7 +220,7 @@ $(function() {
      */
     $('#change_password_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('change_password_form', '/easy-shop/admin/user/');
+        createOrUpdateByAjax('change_password_form', '/admin/user/');
     });
 
     /**
@@ -228,7 +229,9 @@ $(function() {
      */
     $('#add_user_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_user_form', '/easy-shop/admin/user/');
+        $('#add_user').addClass('disabled').attr('disabled', true);
+        createOrUpdateByAjax('add_user_form', '/admin/user/');
+        $('#add_user').removeClass('disabled').removeAttr('disabled');
     });
 
     /**
@@ -237,7 +240,7 @@ $(function() {
      */
     $('#edit_user_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_user_form', '/easy-shop/admin/user/');
+        createOrUpdateByAjax('edit_user_form', '/admin/user/');
     });
 
     /**
@@ -246,7 +249,7 @@ $(function() {
      */
     $('#add_designation_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_designation_form', '/easy-shop/admin/designation/');
+        createOrUpdateByAjax('add_designation_form', '/admin/designation/');
     });
 
     /**
@@ -255,7 +258,7 @@ $(function() {
      */
     $('#edit_designation_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_designation_form', '/easy-shop/admin/designation/');
+        createOrUpdateByAjax('edit_designation_form', '/admin/designation/');
     });
 
     /**
@@ -264,7 +267,7 @@ $(function() {
      */
     $('#add_political_party_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_political_party_form', '/easy-shop/admin/political_party/');
+        createOrUpdateByAjax('add_political_party_form', '/admin/political_party/');
     });
 
     /**
@@ -273,7 +276,7 @@ $(function() {
      */
     $('#edit_political_party_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_political_party_form', '/easy-shop/admin/political_party/');
+        createOrUpdateByAjax('edit_political_party_form', '/admin/political_party/');
     });
 
     /**
@@ -282,7 +285,7 @@ $(function() {
      */
     $('#add_category_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_category_form', '/easy-shop/admin/category/');
+        createOrUpdateByAjax('add_category_form', '/admin/category/');
     });
 
     /**
@@ -291,7 +294,7 @@ $(function() {
      */
     $('#edit_category_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_category_form', '/easy-shop/admin/category/');
+        createOrUpdateByAjax('edit_category_form', '/admin/category/');
     });
 
     /**
@@ -324,7 +327,7 @@ $(function() {
         }
 
         e.preventDefault();
-        createOrUpdateByAjax('add_product_form', '/easy-shop/admin/product/');
+        createOrUpdateByAjax('add_product_form', '/admin/product/');
     });
 
     /**
@@ -356,7 +359,7 @@ $(function() {
         }
 
         e.preventDefault();
-        createOrUpdateByAjax('edit_product_form', '/easy-shop/admin/product/');
+        createOrUpdateByAjax('edit_product_form', '/admin/product/');
     });
 
     /**
@@ -365,7 +368,7 @@ $(function() {
      */
     $('#edit_product_desc_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_product_desc_form', '/easy-shop/admin/product/');
+        createOrUpdateByAjax('edit_product_desc_form', '/admin/product/');
     });
 
     /**
@@ -391,7 +394,7 @@ $(function() {
         }
 
         e.preventDefault();
-        createOrUpdateByAjax('add_product_attribute_detail_form', '/easy-shop/admin/product_attribute_detail/');
+        createOrUpdateByAjax('add_product_attribute_detail_form', '/admin/product_attribute_detail/');
     });
 
     /**
@@ -417,7 +420,7 @@ $(function() {
         }
 
         e.preventDefault();
-        createOrUpdateByAjax('edit_product_attribute_detail_form', '/easy-shop/admin/product_attribute_detail/');
+        createOrUpdateByAjax('edit_product_attribute_detail_form', '/admin/product_attribute_detail/');
     });
 
     /**
@@ -455,7 +458,7 @@ $(function() {
         /*=====  End of form_multiselect newspaper comment block  ======*/
 
         e.preventDefault();
-        createOrUpdateByAjax('edit_columnist_form', '/easy-shop/admin/columnist/');
+        createOrUpdateByAjax('edit_columnist_form', '/admin/columnist/');
     });
 
 
@@ -494,7 +497,7 @@ $(function() {
         /*=====  End of form_multiselect halqa comment block  ======*/
 
         e.preventDefault();
-        createOrUpdateByAjax('add_politician_form', '/easy-shop/admin/politician/');
+        createOrUpdateByAjax('add_politician_form', '/admin/politician/');
     });
 
     /**
@@ -503,7 +506,7 @@ $(function() {
      */
     $('#add_column_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_column_form', '/easy-shop/admin/column/');
+        createOrUpdateByAjax('add_column_form', '/admin/column/');
     });
 
     /**
@@ -512,7 +515,7 @@ $(function() {
      */
     $('#edit_column_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_column_form', '/easy-shop/admin/post/');
+        createOrUpdateByAjax('edit_column_form', '/admin/post/');
     });
 
     /**
@@ -543,7 +546,7 @@ $(function() {
         /*=====  End of form_multiselect type comment block  ======*/
 
         e.preventDefault();
-        createOrUpdateByAjax('add_post_form', '/easy-shop/admin/post/');
+        createOrUpdateByAjax('add_post_form', '/admin/post/');
     });
 
     /**
@@ -574,7 +577,7 @@ $(function() {
         /*=====  End of form_multiselect type comment block  ======*/
 
         e.preventDefault();
-        createOrUpdateByAjax('edit_post_form', '/easy-shop/admin/post/');
+        createOrUpdateByAjax('edit_post_form', '/admin/post/');
     });
 
     /**
@@ -611,7 +614,7 @@ $(function() {
         /*=====  End of form_multiselect designation comment block  ======*/
 
         e.preventDefault();
-        createOrUpdateByAjax('edit_politician_form', '/easy-shop/admin/politician/');
+        createOrUpdateByAjax('edit_politician_form', '/admin/politician/');
     });
 
     /**
@@ -620,7 +623,7 @@ $(function() {
      */
     $('#add_halqa_type_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_halqa_type_form', '/easy-shop/admin/halqa_type/');
+        createOrUpdateByAjax('add_halqa_type_form', '/admin/halqa_type/');
     });
 
     /**
@@ -629,7 +632,7 @@ $(function() {
      */
     $('#edit_halqa_type_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_halqa_type_form', '/easy-shop/admin/halqa_type/');
+        createOrUpdateByAjax('edit_halqa_type_form', '/admin/halqa_type/');
     });
 
     /**
@@ -638,7 +641,7 @@ $(function() {
      */
     $('#add_halqa_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_halqa_form', '/easy-shop/admin/halqa/');
+        createOrUpdateByAjax('add_halqa_form', '/admin/halqa/');
     });
 
     /**
@@ -647,7 +650,7 @@ $(function() {
      */
     $('#edit_halqa_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_halqa_form', '/easy-shop/admin/halqa/');
+        createOrUpdateByAjax('edit_halqa_form', '/admin/halqa/');
     });
 
     /**
@@ -656,7 +659,7 @@ $(function() {
      */
     $('#login_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('login_form', '/easy-shop/admin/login/');
+        createOrUpdateByAjax('login_form', '/admin/login/');
     });
 
     /*=====  End of Submit Handler comment block  ======*/
@@ -678,16 +681,30 @@ $(function() {
         },
         source: function(request, response)
         {
+            var user_search_btn = $('#user_search_btn');
+            var loading = $("#spinner");
             if($.inArray('user', path_parts) !== -1) {
                 url = base_url + "/admin/user/user_full_name_autocomplete/";
-                console.log(1);
+                $.ajaxSetup({
+                    beforeSend: function(){
+                        user_search_btn.attr('disabled', true);
+                        user_search_btn.children().remove();
+                        loading.clone().appendTo('#user_search_btn').removeClass('hide').show();
+                    },
+                    complete: function(){
+                        user_search_btn.removeAttr('disabled');
+                        user_search_btn.children().remove();
+                        user_search_btn.append('<i class="fa fa-search"></i>');
+                        loading.hide();
+                    }
+                });
+
                 $.post(url, {full_name:request.term}, function(full_name){
                     response($.map(full_name, function(user) {
                         return {
                             value: user
                         };
                     }).slice(0, 5));
-
                 }, "json");
             }
             else if($.inArray('product', path_parts) !== -1) {
@@ -719,7 +736,7 @@ $(function() {
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host
-     * e.g '/easy-shop/admin/user/']
+     * e.g '/admin/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation();
      * To prevent event from propagating (or "bubbling up") the DOM. So
      * parent element event won;t trigger
@@ -755,7 +772,7 @@ $(function() {
                     $.each(data, function(index, error) {
                         if(index == 'password')
                         {
-                            $('#password').val('');
+                            $('#password, #confirm_password').val('');
                         }
                         index.length !== 0 ? $('#' + index + '_error').html(error) : $('#' + index + '_error').html('');
                     });
@@ -783,13 +800,13 @@ $(function() {
         entity = id[2] == 'political' ? id[2] + '_' + id[3] : id[2];
         id = id[1];
 
-        if(path_parts[3] == 'post')
+        if(path_parts[2] == 'post')
         {
-            getModal(base_url + '/admin/' + path_parts[3] + '/get_modal/' + id, action + '_' + entity);
+            getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action + '_' + entity);
         }
         else
         {
-            getModal(base_url + '/admin/' + path_parts[3] + '/get_modal/' + id, action)
+            getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
         }
     });
 
@@ -805,7 +822,7 @@ $(function() {
         entity = id[2];
         id = id[1];
 
-        getModal(base_url + '/admin/' + path_parts[3] + '/get_modal/' + id, action)
+        getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
     });
 
     if(path_parts[4] == 'add_gallery_pics_lookup')
@@ -863,11 +880,11 @@ $(function() {
         entity = id[2] == 'political' ? id[2] + '_' + id[3] : id[2];
         id = id[1];
         /*
-         if(path_parts[3] == 'post')
+         if(path_parts[2] == 'post')
          {
-         getModal(base_url + '/admin/' + path_parts[3] + '/get_modal/' + id, action + '_' + entity);
+         getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action + '_' + entity);
          }*/
-        getModal(base_url + '/admin/' + path_parts[3] + '/get_modal/' + id, action)
+        getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
     });
 
     /**
@@ -883,9 +900,9 @@ $(function() {
         var entity_id = id[2] == 'political' ? id[5] : id[4];
         id = id[1];
         var details = action + '_' + entity + '_' + featured + '_' + entity_id;
-        if(path_parts[3] == 'post')
+        if(path_parts[2] == 'post')
         {
-            setPostFeature(base_url + '/admin/' + path_parts[3] + '/set_post_feature_lookup', details);
+            setPostFeature(base_url + '/admin/' + path_parts[2] + '/set_post_feature_lookup', details);
         }
     });
 
@@ -919,7 +936,6 @@ $(function() {
     function userSearch() {
         var role_id = $('#search_by_user_role').val();
         var full_name = $.trim($('#search_by_user_full_name').val());
-
         if(role_id.length > 0 || full_name.length > 0) {
             searchUser(role_id, full_name);
         }
@@ -936,7 +952,7 @@ $(function() {
 
     $(document).on('change', '[id^="product_attribute_"]', function() {
 
-        if(path_parts[3] == 'product_attribute') {
+        if(path_parts[2] == 'product_attribute') {
 
             if($('#product_attribute option:selected').text().toLowerCase()  == 'color') {
 
@@ -1059,7 +1075,7 @@ $(function() {
         return length - 1; // to ignore Choose one or more option in the count
     }
 
-    if(path_parts[3] == 'product_attribute_detail')
+    if(path_parts[2] == 'product_attribute_detail')
     {
         $(".pick-a-color").pickAColor({
             showSpectrum            : true,
@@ -1164,17 +1180,26 @@ $(function() {
      =            searchUser comment block           =
      =============================================*/
 
-    function searchUser(id)
+    function searchUser(role_id, full_name)
     {
-        var data = {'role_id': id};
+        var data = {'role_id': role_id, 'full_name': full_name};
+
+        var elemets_to_disable = $('#search_by_user_role, #search_by_user_full_name, #user_search_btn');
+
         // calling ajax
         jQuery.ajax({
             url: base_url + '/admin/user/search_user_lookup/',
             method: 'post',
             data: data,
+            beforeSend: function() {
+                jQuery('#searched_results').empty();
+                elemets_to_disable.attr('disabled', true);
+                loading.show();
+            },
             success: function(data)
             {
-                jQuery('#searched_results').empty();
+                loading.hide();
+                elemets_to_disable.removeAttr('disabled');
                 jQuery('#searched_results').append(data);
             },
             error: function()
@@ -1307,7 +1332,7 @@ $(function() {
 
     function getProductDetailOptions(id, product_attribute, selected_text, product_attribute_detail_values)
     {
-        base_url = base_url == undefined ? 'http://localhost/easy-shop' : base_url;
+        base_url = base_url == undefined ? 'http://localhost/ims' : base_url;
         var url = base_url + '/admin/product/get_product_details_options';
 
         var product_attribute_detail_values = product_attribute_detail_values || '';
@@ -1488,6 +1513,11 @@ $(function() {
     }
 
     /*=====  End of Image Ajax Loader comment block  ======*/
+
+    $('.pagination a').on('click', function(){
+        var _this = $(this);
+        window.location = _this.attr('href');
+    });
 
 });
 

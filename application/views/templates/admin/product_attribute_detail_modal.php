@@ -17,12 +17,12 @@
             </div>
 
             <!-- modal-body -->
-            <div class="modal-body">
+            <div class="modal-body no-padding">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 no-padding">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-condensed table-striped admin-table text-center">
+                                <table class="table table-bordered table-condensed table-striped admin-table text-center no-margin">
                                     <col width="100">
                                     <col width="70">
                                     <col width="70">

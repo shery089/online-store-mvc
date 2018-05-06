@@ -64,7 +64,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="<?= site_url('dashboard') ?>">Easy Shop Admin v1.0</a> <!--  - Appointment Management System -->
+                <a class="navbar-brand" href="<?= site_url('dashboard') ?>">Inventory Management System Admin v1.0.0</a> <!--  - Appointment Management System -->
             </div>
             <!-- /.navbar-header -->
 

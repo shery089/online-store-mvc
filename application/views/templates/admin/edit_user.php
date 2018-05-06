@@ -4,8 +4,7 @@
 
         <div class="col-lg-8">
             <!-- Form -->
-            <?php foreach ($record as $user): ?>
-            <?= form_open_multipart('admin/user/edit_user_lookup/'. custom_echo($user, 'id'), 'class=form id=edit_user_form novalidate'); ?>
+            <?= form_open_multipart('admin/user/edit_user_lookup/'. $user['id'], 'class=form id=edit_user_form novalidate'); ?>
             <h1 class="page-header text-center"><?= $layout_title ?></h1>
             
         <!-- First Name -->
@@ -21,7 +20,7 @@
                             'class'         => 'form-control',
                             'name'          => 'first_name',
                             'id'            => 'first_name',
-                            'value'         => custom_echo($user, 'first_name')
+                            'value'         => ucwords($user['first_name'])
                             
                         );
                     ?>
@@ -44,7 +43,7 @@
                             'class'         => 'form-control',
                             'name'          => 'middle_name',
                             'id'            => 'middle_name',
-                            'value'         => custom_echo($user, 'middle_name')
+                            'value'         => ucwords($user['middle_name'])
                         );
                     ?>
                         
@@ -67,7 +66,7 @@
                             'class'         => 'form-control',
                             'name'          => 'last_name',
                             'id'            => 'last_name',
-                            'value'         => custom_echo($user, 'last_name')
+                            'value'         => ucwords($user['last_name'])
                         );
                     ?>                        
                     <?= form_input($data); ?>
@@ -92,7 +91,7 @@
                             'class'         => 'form-control',
                             'name'          => 'user_name',
                             'id'            => 'user_name',
-                            'value'         => custom_echo($user, 'user_name')
+                            'value'         => ucwords($user['user_name'])
                         );
                     ?>
 
@@ -120,7 +119,7 @@
                             'type'          => 'email',
                             'name'          => 'email',
                             'id'            => 'email',
-                            'value'         => custom_echo($user, 'email')
+                            'value'         => $user['email']
                         );
                     ?>
 
@@ -153,7 +152,7 @@
                             $options[$id] = ucwords(entity_decode($role['name']));
                         }
 
-                        $selected = custom_echo($user, 'role_id')
+                        $selected = $user['role_id']
 
                     ?>
                     <?= form_dropdown('role', $options, $selected, $data); ?>
@@ -174,7 +173,7 @@
                             'class'         => 'form-control',
                             'name'          => 'mobile_number',
                             'id'            => 'mobile_number',
-                            'value'         => custom_echo($user, 'mobile_number')
+                            'value'         => $user['mobile_number']
                         );
                     ?>
 
@@ -225,7 +224,7 @@
     <?= form_close(); ?>
     <!-- / Form -->
         <div id="image_preview">
-            <img class="img-responsive previewing fadein img-rounded" id="previewing" src="<?= USER_IMAGE_PATH . custom_echo($user, 'image', 'no_case_change') ?>" />
+            <img class="img-responsive previewing fadein img-rounded" id="previewing" src="<?= USER_IMAGE_PATH . $user['image'] ?>" />
             <div id="loading">
                 <img class="img-responsive" src="<?= ADMIN_IMAGES_PATH; ?>/coursera_ditto.gif" />
             </div>
@@ -233,8 +232,5 @@
         </div>
         <br>
     </div>
-
     </div>
-    <?php endforeach ?>
-            
 </div> <!-- /.row

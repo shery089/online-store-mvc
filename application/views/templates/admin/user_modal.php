@@ -17,37 +17,30 @@
             </div>
 
             <!-- modal-body -->
-            <div class="modal-body">
+            <div class="modal-body no-padding">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 no-padding">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-condensed table-striped admin-table">
-                                    <col width="100">
-                                    <col width="70">
-                                    <col width="85">
-                                    <col width="100">
-                                    <col width="110">
-                                    <col width="100">
                                     <thead>
-                                        <th>Full Name</th>
-                                        <th>User Name</th>
-                                        <th>Email</th>
-                                        <th>Mobile Number</th>
-                                        <th>Role</th>
-                                        <th>Joined Date</th>
-                                        <th>Updated Date</th>
+                                        <th class="text-center">Full Name</th>
+                                        <th class="text-center">User Name</th>
+                                        <th class="text-center">Email</th>
+                                        <th class="text-center">Mobile Number</th>
+                                        <th class="text-center">Role</th>
+                                        <th class="text-center">Joined Date</th>
+                                        <th class="text-center">Updated Date</th>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($record as $user): ?>
                                         <tr>
-                                            <td><?= custom_echo($user, 'full_name'); ?></td>
-                                            <td><?= custom_echo($user, 'user_name'); ?></td>
-                                            <td><?= custom_echo($user, 'email'); ?></td>
-                                            <td><?= custom_echo($user, 'mobile_number'); ?></td>
-                                            <td><?= custom_echo($user, 'role'); ?></td>
-                                            <td><?= custom_echo($user, 'joined_date'); ?></td>
-                                            <td><?= custom_echo($user, 'updated_date'); ?></td>
+                                            <td class="text-center"><?= ucwords($user['full_name']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['user_name']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['email']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['mobile_number']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['role']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['joined_date']); ?></td>
+                                            <td class="text-center"><?= ucwords($user['updated_date']); ?></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -62,11 +55,10 @@
                     <button type="button" class="btn btn-default" onclick="closeModel()"><?= ($action) == 'delete' ? "Cancel" : "Close" ?></button>
                     <?php
                     if($action == 'delete'): ?>
-                        <a href="<?= site_url('admin/user/delete_user_by_id_lookup/' . custom_echo($user, 'id')); ?>" class="btn btn-danger">Delete</a>
+                        <a href="<?= site_url('admin/user/delete_user_by_id_lookup/' . ucwords($user['id'])); ?>" class="btn btn-danger">Delete</a>
                     <?php endif; ?>
                 </div>
             </div>  <!-- end modal-footer -->
-            <?php endforeach ?>
         </div>
 </div>  
 

@@ -129,7 +129,6 @@ class Login extends CI_Controller {
 				);
 
 				$this->session->set_userdata($newdata);
-			    // redirect('/admin/post');
 				echo json_encode(array('success' => 'login successful'));
 			}
 			else

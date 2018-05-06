@@ -3,26 +3,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class PD_Photo extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://localhost/pak_dempcrates/photo
-	 *	- or -
-	 *		http://localhost/pak_dempcrates/index.php/home/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://localhost/pak_dempcrates/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/home/<method_name>
-	 */	
-
 	public function __construct()
 	{
 		parent::__construct();	
 	}
 
+    /**
+     * Saves an image
+     * @param $photo
+     * @param $upload_path
+     * @param $name
+     * @return string
+     */
 	public function save_photo($photo, $upload_path, $name)
 	{
     	if(!empty($photo))
@@ -38,11 +30,9 @@ class PD_Photo extends CI_Controller {
 
 	        $config['file_name'] = $new_name;
      		
-     		$config['max_size'] = 100000000;
+     		$config['max_size'] = 15000000;
 
 			$this->upload->initialize($config);
-
-            // $this->load->library('upload', $config);
 
             if ($this->upload->do_upload($name))
             {
@@ -50,23 +40,18 @@ class PD_Photo extends CI_Controller {
             	return $new_name;
             }
     	}
-	}	
+	}
 
-
+    /**
+     * Deletes an image
+     * @param $image_directory
+     * @param $data
+     */
 	public function delete_picture($image_directory, $data)
 	{
-		if(!is_numeric(current($data)))
-		{
-			$data = current($data);
-			$image = custom_echo($data, 'image', 'no_case_change');
-			$profile_image = custom_echo($data, 'profile_image', 'no_case_change');
-			$thumbnail = custom_echo($data, 'thumbnail', 'no_case_change');
-		}
-		else {
-			$image = $data['image'];
-			$profile_image = $data['profile_image'];
-			$thumbnail = $data['thumbnail'];
-		}
+        $image = $data['image'];
+        $profile_image = $data['profile_image'];
+        $thumbnail = $data['thumbnail'];
 
 		if($image != 'no_image_600.png')
 		{
@@ -84,49 +69,12 @@ class PD_Photo extends CI_Controller {
 		}
 	}
 
-	/*
-
-	public function delete_picture($id, $model, $method, $image_directory, $db_field)
-	{
-		$model = explode('/', $model);
-		$model = $model[1];
-
-		$result = $this->$model->$method($id, TRUE); // TRUE to get full record including picture
-
-		$image = $model == 'user_model' ? $result[0][$db_field]: $result[$db_field];
-
-		if($image != 'no_image_600.png')
-		{
-			unlink($image_directory . DS . $image);
-		}
-
-		$allowed_models = array('category_model', 'user_model');
-
-		if(in_array($model, $allowed_models))
-		{
-			$image_thumb = $model == 'user_model' ? $result[0]['thumbnail']: $result['thumbnail'];
-
-			if($model !== 'user_model')
-			{
-				$profile_image = $model == 'user_model' ? $result[0][$db_field]: $result['profile_image'];
-			}
-
-			if($image_thumb != 'no_image_600_thumb.png')
-			{
-				unlink($image_directory . DS . $image_thumb);
-			}
-
-			if($model !== 'user_model')
-			{
-				if($profile_image != 'no_image_600_profile_image.png')
-				{
-					unlink($image_directory . DS . $profile_image);
-				}
-			}
-
-		}
-	}*/
-
+    /**
+     * Makes new compressed images
+     * @param $img
+     * @param $dest
+     * @param $desired_width
+     */
 	public function make_thumb($img, $dest, $desired_width)
 	{
 		$path_parts = pathinfo($img);

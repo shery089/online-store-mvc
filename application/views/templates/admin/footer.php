@@ -37,7 +37,7 @@
 
     <script src="<?= ADMIN_ASSETS ?>pick-a-color/js/tinycolor-0.9.15.min.js"></script>
 
-    <footer class="text-center"> Easy Shop Admin v1.0 &copy; <?= currentYear() == '2017' ? '2017' : '2017 - ' . currentYear(); ?> </footer>
+    <footer class="text-center"> Inventory Management System Admin v1.0.0 &copy; <?= currentYear() == '2018' ? '2018' : '2018 - ' . currentYear(); ?> </footer>
 
 </body>
 

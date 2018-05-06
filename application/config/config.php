@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do thatt on your own.
 |
 */
-$config['base_url'] = 'local.ims.com';
+$config['base_url'] = BASE_URL;
 
 /*
 |--------------------------------------------------------------------------
@@ -526,38 +526,15 @@ $config['proxy_ips'] = '';
 */
 //$config['keycdn_url']   = '<your_zone_url>';
 
-//$config['assets'] = 'assets/';
-/*
-function __autoload($class)
-{
-	die(APPPATH."controllers/admin/". ucfirst($class) . '.php');
-    if (file_exists(APPPATH."controllers/admin/". ucfirst($class) . '.php'))
-    {
-        require_once(APPPATH.'controllers/admin/'. ucfirst($class) . '.php');
-    }
-    
-    if (file_exists(APPPATH."controllers/f/". ucfirst($class) . '.php'))
-    {
-        require_once(APPPATH.'controllers/f/'. ucfirst($class) . '.php');
-    }
-}
-
-*/
-
-
 /**
  * 
- * @param  [type] $class [class that has to be autoload]
- * @return [type]        [description]
+ * @param  [type] You need to provide a "callable" with $class as a param
+ * @return [type] [Loads the desired class]
  */
-function __autoload($class)
-{
+
+spl_autoload_register(function($class){
     if (file_exists(APPPATH . "core/" . ucfirst($class) . '.php'))
     {
         require_once(APPPATH . "core/" .  ucfirst($class) . '.php');
     }
-    // if (file_exists(APPPATH . "models/f" . strtolower($class) . '.php')) 
-    // {
-    //     require_once(APPPATH . "models/f" . strtolower($class) . '.php';
-    // }
-}
+});

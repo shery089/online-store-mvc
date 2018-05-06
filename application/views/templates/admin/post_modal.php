@@ -17,7 +17,7 @@
                 <h4 class="text-center"><?= ($action = $action_parts[0]) == 'delete' ? "Are You Sure?" : "Political Party Details"; ?></h4>
             </div>
             <!-- modal-body -->
-            <div class="modal-body">
+            <div class="modal-body no-padding">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-12">

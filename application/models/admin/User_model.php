@@ -1,30 +1,5 @@
-<?php  
-    /**
-    * User_model class is model of User controller it performs 
-    * basic CRUD operations
-    * Methods: insert_user
-    *          update_user
-    *          delete_user
-    *          get_user_by_id
-    *          get_attachments
-    *          record_count
-    *          fetch_users
-    */
-
+<?php
     class User_model extends CI_Model {
-
-        private $user_name,
-                $first_name,
-                $middle_name,
-                $last_name,
-                $salt,
-                $password,
-                $email,
-                $mobile_number,
-                $role,
-                $joined_date,
-                $updated_date,
-                $image;
 
         public function __construct()
         {
@@ -33,10 +8,11 @@
         }
 
         /**
-         * [insert_user: Inserts a user record into the database]
-         * @param  [string] $image [New random image name]
-         * @return [boolean] [if insertion is performed successfully 
-         * then, returns TRUE.]
+         * Inserts a user record into the database
+         * @param string $image
+         * @param string $thumb_image
+         * @param string $profile_image
+         * @return bool
          */
         public function insert_user($image = '', $thumb_image = '', $profile_image = '')
         {
@@ -111,50 +87,20 @@
             if ($this->db->insert('user', $data))
             {
                 $id = $this->db->insert_id();
-                $this->insert_user_elasticsearch($id, $data);
                 return TRUE;
             }
         }
 
-            public function insert_user_elasticsearch($id, $data) {
-                $role = $this->role_model->get_role_name_by_id($data['role_id']);
-
-                $data['middle_name'] = empty($data['middle_name']) ? $data['middle_name'] : ' ' . $data['middle_name'];
-
-                $data['full_name'] = $data['first_name'] . $data['middle_name'] . ' ' . $data['last_name'];
-                $data['id'] = $id;
-                $data['role'] =  $role['role'];
-
-    //            unset($data['first_name'], $data['middle_name'], $data['last_name']);
-
-//                $index = array('index' => array("_index" => "users", "_type" => "user", "_id" => $id));
-//
-//                $index = json_encode($index);
-//                $result = json_encode($data);
-//
-//                $result = $index . $result;
-//
-//                $result = str_replace("}{", "}\n\r{", $result);
-//
-//                file_put_contents(JSON_FILE_PATH . '/results.json', $result);
-//                $json_data = file_get_contents(JSON_FILE_PATH."/results.json");
-//                $json_data = str_replace(array('[', ']'), '', $json_data);
-//                $json_data .= "\n\r";
-
-                $json_data = json_encode($data);
-
-                $this->elasticsearch->add("users", "user", $id, $json_data);
-                $this->elasticsearch->refresh_index_type('users', 'user', $id);
-            }
-
         /**
-         * [update_user: Updates a user record into the database]
-         * @param  [int] $id    [user id whom record is updating]
-         * @param  [string] $image [new image name if previous one is change else it is
-         * the old one]
-         * @return [boolean] [if insertion is performed successfully then, returns TRUE.]
+         * Updates a user record into the database
+         * @param $id
+         * @param $image
+         * @param $image_thumb
+         * @param $profile_image
+         * @param $joined_date
+         * @return bool
          */
-        public function update_user($id, $image, $image_thumb, $profile_image, $joined_date)
+        public function update_user($id, $image, $image_thumb, $profile_image)
         {
             $this->user_name = strtolower(trim($this->db->escape($this->input->post('user_name')), "' "));
             
@@ -172,11 +118,7 @@
         
             date_default_timezone_set("Asia/Karachi");
             
-            $date = date("Y-m-d H:i:s");
-
-            $this->joined_date = $joined_date;
-
-            $this->updated_date = $date;
+            $this->updated_date = date("Y-m-d H:i:s");
 
             if(!empty($image))
             {
@@ -208,17 +150,12 @@
                 'role_id' => $this->role,
 
                 'updated_date' => $this->updated_date,
-
-                'joined_date' => $this->joined_date
-
             );
 
             $this->db->where('id', $id);
                 
             if ($this->db->update('user', $data))
             {
-                $this->insert_user_elasticsearch($id, $data);
-                $this->elasticsearch->refresh_index_type('users', 'user', $id);
                 return TRUE;
             }
         }
@@ -234,36 +171,31 @@
             {
                 return TRUE;
             }
-        }       
+        }
 
         /**
-         * [get_user_by_id Fetchs a user record from the database by user id]
-         * @param  [type]  $id   [user id whom record is to be fetched]
-         * @param  [boolean] $edit [Default: FALSE. If it is set to TRUE then 
-         * all attibutes areretrieved for editing purpose. If it is FALSE than 
-         * attibutes are retrieved for display/view purpose]
-         * @return [array] [User record is returned]
+         * Returns a user record from the database by user id
+         * @param $id
+         * @param $fields
+         * @return bool
          */
-        public function get_user_specific_record_by_id($id, $fields)
+        public function get_user_by_id_lookup($id, $return_role_name=FALSE)
         {
-            if(is_array($fields)) {
-                $fields = implode(', ', $fields);
-                $fields = rtrim(', ', $fields);
-                $this->db->select($fields);
-            }
-            else {
-                $this->db->select($fields);
-            }
+            $this->db->select('`user`.`id`, `user`.`first_name`, `user`.`middle_name`, `user`.`last_name`, CONCAT(`user`.`first_name`, " ", `user`.`middle_name`, " ", `user`.`last_name`) AS `full_name`,
+                `user`.`user_name`, `user`.`mobile_number`, `user`.`email`, `user`.`image`, `user`.`profile_image`, `user`.`thumbnail`,
+                `user`.`role_id`, DATE_FORMAT(`user`.`joined_date`, "%d %M %Y") AS `joined_date`, 
+                DATE_FORMAT(`user`.`updated_date`, "%d %M %Y") AS `updated_date`');
 
-            $query = $this->db->get('user');
-
-            if ($query->num_rows() > 0)
-            {
+            $this->db->from('user');
+            $this->db->where('id', $id);
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
                 $result = $query->result_array();
-
-                return $result;
+                if($return_role_name) {
+                    $result = $this->get_attachments($result);
+                }
+                return $result[0];
             }
-
             return FALSE;
         }
 
@@ -274,36 +206,59 @@
          * @return [array]              [User record with attachments e.g. role_id role name 
          * against role_id of user]
          */
-        public function get_attachments($attachments, $apply_indexing = FALSE)
+        public function get_attachments($attachments)
         {
-            $index_arr = array();
-            for ($i = 0, $count = count($attachments); $i < $count; $i++) 
+            for ($i = 0, $count = count($attachments); $i < $count; $i++)
             {
-                if($apply_indexing) { // for elastic search
-                    $index = !empty($index_arr) ? count($index_arr) : $i;
-                    $index_arr[$index] = array('index' => array("_index" => "users", "_type" => "user", "_id" => $attachments[$i]['id']));
-                    $index = $i == 0 ? $i+1 : $index+1;
-                    $index_arr[$index] = $attachments[$i];
-                    $role = $this->role_model->get_role_name_by_id($attachments[$i]['role_id']);
-
-                    $index_arr[$index]['role'] =  $role['role'];
-                }
-                else {
-                    $attachments[$i]['role'] = $this->role_model->get_role_by_id($attachments[$i]['role_id']);
-                }
+                $attachments[$i]['role'] = $this->role_model->get_role_by_id($attachments[$i]['role_id'], TRUE);
             }
-            return $index_arr;
+            return $attachments;
         }
 
         /**
          * [record_count Returns total records in the database]
          * @return [int] [Returns total records in the database]
          */
-        public function record_count() 
+        public function record_count($params=array())
         {
-            return $this->db->count_all("user");
-        }
+            if(!isset($params['full_name']) && !isset($params['role_id'])) {
+                return $this->db->count_all("user");
+            }
 
+            if(isset($params['full_name']) || isset($params['role_id'])) {
+                $this->db->select('COUNT(id) as total');
+            }
+
+            if(isset($params['full_name'])) {
+                $full_name = strtolower($params['full_name']);
+                $full_name = preg_replace('!\s+!', ' ', $full_name);
+
+                if(strpos($full_name, ' ') !== FALSE) {
+                    $full_name = explode(' ', $full_name);
+                    array_walk($full_name, function(&$value,$key) {
+                        $value="$value*";
+                    });
+                    $full_name = implode(' ', $full_name);
+                }
+                else {
+                    $full_name .= '*';
+                }
+
+                $this->db->where("MATCH (`first_name`, `last_name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
+            }
+
+            if(isset($params['role_id'])) {
+                if(!empty($params['role_id'])) {
+                    $this->db->where('role_id',$params['role_id']);
+                }
+            }
+
+            $this->db->from('user');
+
+            $query = $this->db->get();
+            $result = $query->result_array();
+            return array_pop($result)['total'];
+        }
 
         /**
          * [fetch_users Returns users with a $limit defined in User controller i.e. $config['per_page']]
@@ -312,55 +267,97 @@
          * @return [mixed] [if there are any users then return them in array else return FALSE is
          * then, returns TRUE.]
          */
-        public function fetch_users($limit, $start) 
+        public function fetch_users($params = array())
         {
             $this->db->select('`user`.`id`, CONCAT(`user`.`first_name`, " ", `user`.`middle_name`, " ", `user`.`last_name`) AS `full_name`,
             `user`.`user_name`, `user`.`mobile_number`, `user`.`email`, `user`.`role_id`');
          
-            $this->db->limit($limit, $start);
-          
-            $this->db->order_by('`full_name`');
+            $this->db->limit($params['per_page'], $params['current_page']);
 
-            $query = $this->db->get('user');
+            if(isset($params['full_name'])) {
+                $full_name = strtolower($params['full_name']);
+                $full_name = preg_replace('!\s+!', ' ', $full_name);
 
-            if ($query->num_rows() > 0) 
+                if(strpos($full_name, ' ') !== FALSE) {
+                    $full_name = explode(' ', $full_name);
+                    array_walk($full_name, function(&$value,$key) {
+                        $value="$value*";
+                    });
+                    $full_name = implode(' ', $full_name);
+                }
+                else {
+                    $full_name .= '*';
+                }
+
+                $this->db->where("MATCH (`first_name`, `last_name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
+            }
+
+            if(isset($params['role_id'])) {
+                if(!empty($params['role_id'])) {
+                    $this->db->where('role_id',$params['role_id']);
+                }
+            }
+
+            $this->db->order_by('`id`', 'desc');
+
+            $this->db->from('user');
+
+            $query = $this->db->get();
+
+            if ($query->num_rows() > 0)
             {
                 $result = $query->result_array();
-
                 $result = $this->get_attachments($result);
-
                 return $result;
             }
 
             return false;
         }
 
-        public function insert_user_bulk_elasticsearch()
+        /**
+         * Returns users by partially and full matches
+         * @param $full_name
+         * @return mixed Returns users full_name array or an empty array
+         */
+        public function user_full_name_autocomplete($full_name)
         {
-            $this->db->select('`user`.`id`,`user`.`first_name`,`user`.`middle_name`,`user`.`last_name`, CONCAT(`user`.`first_name`, `user`.`middle_name`, " ", `user`.`last_name`) AS `full_name`,
-            `user`.`user_name`, `user`.`password`, `user`.`salt`, `user`.`image`, `user`.`thumbnail`, `user`.`profile_image`,
-            `user`.`email` , `user`.`mobile_number`, `user`.`role_id`, `user`.`joined_date`, `user`.`updated_date`');
+            $this->db->select('CONCAT(`user`.`first_name`, " ", `user`.`last_name`) AS `full_name`');
 
-            $this->db->order_by('`full_name`');
+            $this->db->limit(AUTOCOMPLETE_RECORD_LIMIT, 0);
+
+            $full_name = preg_replace('!\s+!', ' ', $full_name);
+
+            if(strpos($full_name, ' ') !== FALSE) {
+                $full_name = explode(' ', $full_name);
+                array_walk($full_name, function(&$value,$key) {
+                    $value="$value*";
+                });
+                $full_name = implode(' ', $full_name);
+            }
+            else {
+                $full_name .= '*';
+            }
+
+            if(isset($full_name)) {
+                $this->db->where("MATCH (`first_name`, `last_name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
+            }
+
+            $this->db->order_by('`full_name`', 'desc');
 
             $query = $this->db->get('user');
-
             if ($query->num_rows() > 0)
             {
                 $result = $query->result_array();
-
-                $result = $this->get_attachments($result, TRUE);
                 return $result;
             }
-            return FALSE;
+
+            return array();
         }
 
         /**
-         * [update_user: Updates a user record into the database]
-         * @param  [int] $id    [user id whom record is updating]
-         * @param  [string] $image [new image name if previous one is change else it is
-         * the old one]
-         * @return [boolean] [if insertion is performed successfully then, returns TRUE.]
+         * Updates a user password
+         * @param $id
+         * @return bool
          */
         public function change_password($id)
         {
@@ -394,6 +391,4 @@
                 return TRUE;
             }
         }
-
-
     }
