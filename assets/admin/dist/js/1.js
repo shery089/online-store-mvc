@@ -21,29 +21,29 @@ $(function() {
     });
         
     var url = window.location;
-    // http://localhost/pak_democrates/admin/user/add_user_lookup
+    // http://localhost/ims/admin/user/add_user_lookup
     
     var host = window.location.hostname;
     // localhost
     
     var pathname = window.location.pathname;
-    // /pak_democrates/admin/user/add_user_lookup
+    // /ims/admin/user/add_user_lookup
     
     var origin = window.location.origin;
     // http://localhost
     
     var path_parts = pathname.split('/');    
     var url_parts = path_parts[1] + '/' + path_parts[2] + '/' + path_parts[3]
-    // pak_democrates/admin/user
+    // ims/admin/user
     
     var active_half_url = origin + '/' + url_parts;
-    // http://localhost/pak_democrates/admin/user
+    // http://localhost/ims/admin/user
     
     // adds active class to selected page in bootstrap pagination
     $('ul.pagination').find('b').closest('li').addClass('active');
 
-    var base_url = origin + '/pak_democrates';
-    // "http://localhost/pak_democrates"
+    var base_url = origin + '/ims';
+    // "http://localhost/ims"
 
     var admin_assets = base_url + '/admin/';
     
@@ -59,7 +59,7 @@ $(function() {
      */
     $('#add_user_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_user_form', '/pak_democrates/admin/user/');
+        createOrUpdateByAjax('add_user_form', '/ims/admin/user/');
     });
 
     /**
@@ -69,7 +69,7 @@ $(function() {
      */
     $('#edit_user_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_user_form', '/pak_democrates/admin/user/');
+        createOrUpdateByAjax('edit_user_form', '/ims/admin/user/');
     });
 
     /*=============================================
@@ -81,7 +81,7 @@ $(function() {
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/admin/user/']
+     * e.g '/ims/admin/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 

@@ -1,13 +1,6 @@
 <?php  
 class Product_model extends CI_Model {
-    private $name,
-            $political_party_id,
-            $halqa_id,
-            $user_designation_id,
-            $introduction,
-            $no_designation_id,
-            $no_halqa_id,
-            $election_history;
+
     public function __construct()
     {
         parent::__construct();        	
@@ -87,10 +80,6 @@ class Product_model extends CI_Model {
             }
         }
 
-        $this->insert_product_elasticsearch($product_id, $data, $attr_count);
-
-        $this->elasticsearch->refresh_index_type("products", "product", $product_id);
-
         return TRUE;
     }
 
@@ -133,7 +122,6 @@ class Product_model extends CI_Model {
             $attr_count = $this->get_attr_details_count();
 
             $count = 1;
-
             for($i = 0; $i < $attr_count; $i++)
             {
                 $product_attr = $this->input->post("submitted_product_attr_$count");
@@ -141,7 +129,9 @@ class Product_model extends CI_Model {
                 $product_attr_details = explode(',', $product_attr_details);
 
                 $prev_records = $this->product_details_records_by_prod_id($product_id, $product_attr);
+                $prev_records = (array) $prev_records;
                 $prev_records = array_column($prev_records, 'product_attribute_detail_value');
+
                 $prev_records_str = implode(',', $prev_records);
 
                 $to_insert = array_diff($product_attr_details, $prev_records);
@@ -167,20 +157,9 @@ class Product_model extends CI_Model {
                         $this->db->insert('product_detail', $product_details_data);
                     }
                 }
-
                 $count++;
             }
         }
-
-        $descs = $this->get_descs_by_id($product_id);
-
-        $data['short_description'] = $descs['short_description'];
-        $data['long_description'] = $descs['long_description'];
-
-        $this->insert_product_elasticsearch($product_id, $data, $attr_count);
-
-        $this->elasticsearch->refresh_index_type("products", "product", $product_id);
-
         return TRUE;
     }
 
@@ -202,17 +181,6 @@ class Product_model extends CI_Model {
 
         if ($this->db->update('product', $data))
         {
-
-            $data = json_encode($data);
-
-            $data = '{
-                    "doc": ' . $data . '
-                }';
-
-            $this->elasticsearch->update_partial_index("products", "product", $product_id, $data);
-
-            $this->elasticsearch->refresh_index_type("products", "product", $product_id);
-
             return TRUE;
         }
 
@@ -233,34 +201,6 @@ class Product_model extends CI_Model {
         }
     }
 
-    public function get_product_detail($product_id)
-    {
-        $this->db->select('product_detail.id, product_detail.product_id, product_detail.designation_id, 
-                        product_detail.halqa_id, user_designation.name AS designation, halqa.name AS halqa');
-        $this->db->from('product_detail');
-        $this->db->where('product_detail.product_id', $product_id);
-        $this->db->join('halqa', 'halqa.id = product_detail.halqa_id', 'inner');
-        $this->db->join('user_designation', 'user_designation.id = product_detail.designation_id', 'inner');
-        $q = $this->db->get();
-        $result = $q->result_array();
-
-        // to delete $this->no_designation_id
-        for ($i = 0, $count = count($result); $i < $count; $i++)
-        {
-            if($result[$i]['designation_id'] == $this->no_designation_id)
-            {
-                unset($result[$i]['designation_id']);
-                unset($result[$i]['designation']);
-            }
-            if($result[$i]['halqa_id'] == $this->no_halqa_id)
-            {
-                unset($result[$i]['halqa_id']);
-                unset($result[$i]['halqa']);
-            }
-        }
-
-        return $result;
-    }
     public function get_products_dropdown()
     {
         $this->db->select('`product`.`id`, `product`.`name`');
@@ -269,46 +209,11 @@ class Product_model extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
-    public function get_product_by_id($id, $edit, $specific_cols = array(), $post = FALSE)
+
+    public function get_attachments($attachments, $return_data_with_joins, $only_product_attributes)
     {
-        if(!empty($specific_cols))
-        {
-            $specific_cols = implode(", ", $specific_cols);
-            $specific_cols = preg_replace('/full_name/', 'CONCAT(`product`.`first_name`, " ", `product`.`middle_name`, " ", `product`.`last_name`) AS `full_name`'
-                                , $specific_cols);
+        for ($i = 0, $count = count($attachments); $i < $count; $i++) {
 
-            $this->db->select($specific_cols);
-        }
-        else if($post)
-        {
-            $this->db->select('`product`.`name`');
-        }
-        else
-        {
-            $this->db->select('*');
-        }
-
-        $this->db->from('product');
-    
-        $this->db->where(array('id' => $id)); 
-        
-        $q = $this->db->get(); 
-
-        $result = $q->result_array();
-    
-        if(!$post)
-        {
-            $result = $this->get_attachments($result);
-        }
-
-
-        return $result[0]; 
-    }
-
-    public function get_attachments($attachments)
-    {
-        for ($i = 0, $count = count($attachments); $i < $count; $i++)
-        {
             $this->db->select('`product_detail`.`product_attribute_detail_id`, `product_detail`.`product_attribute_detail_value`');
 
             $this->db->from('`product_detail`');
@@ -319,12 +224,11 @@ class Product_model extends CI_Model {
 
             $attachments[$i]['product_details']  = $query->result_array();
 
-            $clean_attachments[$i] = $this->clean_attachments($attachments[$i], $i);
-
-            unset($attachments[$i]);
+            if($return_data_with_joins || $only_product_attributes) {
+                $attachments[$i] = $this->clean_attachments($attachments[$i], $only_product_attributes);
+            }
         }
-
-        return $clean_attachments;
+        return $attachments;
     }
 
     /**
@@ -345,97 +249,145 @@ class Product_model extends CI_Model {
      * @return array
      *
      */
-    public function clean_attachments($attachments)
+    public function clean_attachments($attachments, $only_product_attributes = FALSE)
     {
-        $category_id = $attachments['category'];
+        if(!$only_product_attributes) {
+            $category_id = $attachments['category'];
+            $category = $this->category_model->get_category_name_by_id($category_id);
 
-        $category = $this->category_model->get_category_name_by_id($category_id);
+            $attachments['category'] =  $category['category'];
 
-        $attachments['category'] =  $category['category'];
-
-        $attachments['category_id'] =  $category_id;
-
-        $index_arr = array();
-        $index_arr[0] = array('index' => array("_index" => "products", "_type" => "product", "_id" => $attachments['id']));
-        $index_arr[1] = $attachments;
+            $attachments['category_id'] =  $category_id;
+        }
 
         $product_attribute_detail_ids = array_values(array_unique(array_column($attachments['product_details'], 'product_attribute_detail_id')));
-        $index_arr[1]['product_attribute_detail_id'] = $product_attribute_detail_ids;
         $product_attribute_detail_values = array_values(array_unique(array_column($attachments['product_details'], 'product_attribute_detail_value')));
-        $index_arr[1]['product_attribute_detail_value'] = $product_attribute_detail_values;
 
         // I have used this extra for loop to avoid redundant multiple call to database to get $product_attr e.g. color, size
 
         for ($k = 0, $kcount = count($product_attribute_detail_ids); $k < $kcount; $k++) {
 
             $product_attr = $this->product_attribute_model->get_product_attr_name_by_id($product_attribute_detail_ids[$k]);
-
-            $product_details = $index_arr[1]['product_details'];
+            $product_details = $attachments['product_details'];
 
             /**
              * This loop will return values specific to a product_attribute_detail_id e.g. $product_attribute_detail_ids[$i] = 1
              *[color] => Array ([0] => #ffffff[1] => #000000[2] => #bfbfbf[3] => #1f1fff)
              **/
             for ($j = 0, $jcount = count($product_details); $j < $jcount; $j++) {
-
                 if($product_attribute_detail_ids[$k] == $product_details[$j]['product_attribute_detail_id']) {
-
                     $product_attr_val = $product_details[$j]['product_attribute_detail_value'];
-                    $index_arr[1][$product_attr][] = $this->product_attribute_detail_model->get_product_attribute_detail_name_by_id($product_attr_val);
+                    $attachments[$product_attr][] = $a = $this->product_attribute_detail_model->get_product_attribute_detail_name_by_id($product_attr_val);
                 }
             }
         }
 
-        unset($index_arr[1]['product_details']);
+        if($only_product_attributes) {
+            unset($attachments['product_details']);
+        }
 
-        return $index_arr;
+        return $attachments;
     }
 
     public function record_count()
     {
-        return $this->db->count_all("product");
-    }
-
-    public function fetch_products($limit, $start, $attach_specialization = TRUE) 
-    {
-        $this->db->select('`product`.`id`, `product`.`name`, `product`.`political_party_id`, `product`.`likes`, `product`.`dislikes`');
-     
-        $this->db->limit($limit, $start);
-      
-        $this->db->order_by('`name`');
-
-        $query = $this->db->get('product');
-
-        if ($query->num_rows() > 0) 
-        {
-            $result = $query->result_array();
-            $result = $this->get_attachments($result, TRUE);
-
-            return $result;
+        if(!isset($params['name']) && !isset($params['category_id'])) {
+            return $this->db->count_all("user");
         }
 
-        return FALSE;
-    }
+        if(isset($params['name']) || isset($params['category_id'])) {
+            $this->db->select('COUNT(id) as total');
+        }
 
-    public function insert_product_bulk_elasticsearch()
-    {
-        $this->db->select('`product`.`id`, `product`.`name`, `product`.`category`, `product`.`image`, `product`.`thumbnail`,
-        `product`.`profile_image`, `product`.`short_description`, `product`.`long_description`');
+        if(isset($params['name'])) {
+            $full_name = strtolower($params['name']);
+            $full_name = preg_replace('!\s+!', ' ', $full_name);
+
+            if(strpos($full_name, ' ') !== FALSE) {
+                $full_name = explode(' ', $full_name);
+                array_walk($full_name, function(&$value,$key) {
+                    $value="$value*";
+                });
+                $full_name = implode(' ', $full_name);
+            }
+            else {
+                $full_name .= '*';
+            }
+
+            $this->db->where("MATCH (`name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
+        }
+
+        if(isset($params['category_id'])) {
+            if(!empty($params['category_id'])) {
+                $this->db->where('`category_id`',$params['category_id']);
+            }
+        }
 
         $this->db->from('`product`');
 
-        $this->db->order_by('`product`.`name`');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return array_pop($result)['total'];
+    }
+
+    public function fetch_products($params = array())
+    {
+        if(isset($params['has_category_join'])) {
+            if ($params['has_category_join']) {
+                $this->db->select('`product`.`id`, `product`.`name`, `product`.`thumbnail`, `category`.`name` AS `category`');
+            }
+            else {
+                $this->db->select('`product`.`id`, `product`.`name`, `product`.`thumbnail`, `product`.`category`');
+            }
+        }
+
+        $this->db->limit($params['per_page'], $params['current_page']);
+
+        if(isset($params['name'])) {
+            $name = strtolower($params['name']);
+            $name = preg_replace('!\s+!', ' ', $name);
+
+            if(strpos($name, ' ') !== FALSE) {
+                $name = explode(' ', $name);
+                array_walk($name, function(&$value,$key) {
+                    $value="$value*";
+                });
+                $name = implode(' ', $name);
+            }
+            else {
+                $name .= '*';
+            }
+
+            $this->db->where("MATCH (`name`) AGAINST ('$name' IN BOOLEAN MODE)");
+        }
+
+        if(isset($params['category_id'])) {
+            if(!empty($params['category_id'])) {
+                $this->db->where('category_id',$params['category_id']);
+            }
+        }
+
+        $this->db->order_by('`product`.`id`', 'desc');
+
+        $this->db->from('product');
+
+        if(isset($params['has_category_join'])) {
+            if($params['has_category_join']) {
+                $this->db->join('`category`', '`category`.`id` = `product`.`category`', 'left');
+            }
+        }
 
         $query = $this->db->get();
 
-        if ($query->num_rows() > 0)
-        {
+        if ($query->num_rows() > 0) {
             $result = $query->result_array();
-
-            $result = $this->get_attachments($result, TRUE);
+            if(!isset($params['has_category_join'])) {
+                $result = $this->get_attachments($result);
+            }
             return $result;
         }
-        return FALSE;
+
+        return false;
     }
 
     public function product_details_records_by_prod_id($product_id, $product_attr_id)
@@ -458,106 +410,6 @@ class Product_model extends CI_Model {
         return FALSE;
     }
 
-    /*
-    public function insert_product_bulk_by_csv($csv)
-    {
-
-        foreach ($csv as $product) 
-        {
-            $data = array(
-
-                'name' => $product['name'],
-
-                'political_party_id' => $product['political_party']
-            );
-        
-            if ($this->db->insert('product', $data)) 
-            {
-                $product_id = $this->db->insert_id();*/
-
-                
-                /** Both halqa_id and user_designation_id insertion is done separetly 
-                 * for a case: If product is both senator and national assembly
-                 * member and we insert halqa_id against the user_designation_id. In
-                 * future election if product is not national assembly member or 
-                 * some other designation is loosed then we will loose the halqa_id 
-                 * on updation. So, both halqa_id and user_designation_id insertion
-                 * is done separetly  
-                 
-
-                /**
-                 * halqa_id insertion in product_detail table
-                 * if: If multiple halqa's are inserted
-                 * else: If single halqa is inserted
-                 */
-
-     /*           if(isset($product['halqa_ids']))
-                {
-                    foreach ($product['halqa_ids'] as $halqa_id) 
-                    {
-                        $this->db->query("INSERT INTO product_detail (product_id, halqa_id, designation_id) 
-                                            VALUES($product_id, $halqa_id, $this->no_designation_id)");                
-                    }
-                    $this->db->query("INSERT INTO product_detail (product_id, halqa_id, designation_id) 
-                                        VALUES($product_id, " . $product['halqa_id'] . ", $this->no_designation_id)");
-                }
-                else
-                {
-                    $this->db->query("INSERT INTO product_detail (product_id, halqa_id, designation_id) 
-                                        VALUES($product_id, " . $product['halqa_id'] . ", $this->no_designation_id)");
-                }
-            }
-        }
-    }*/
-
-    public function insert_product_elasticsearch($id, $data, $attr_count) {
-
-        $category_id = $data['category'];
-
-        $category = $this->category_model->get_category_name_by_id($category_id);
-
-        $count = 1;
-
-        for($i = 0; $i < $attr_count; $i++) {
-
-            $product_attr_details = $this->input->post("submitted_product_attr_details_$count");
-            $product_attr_id = $this->input->post("submitted_product_attr_$count");
-
-            $data['product_attribute_detail_id'][] = $product_attr_id;
-            if(strrchr($product_attr_details, ','))
-            {
-                $product_attr_details = explode(',', $product_attr_details);
-
-                $product_attr = $this->product_attribute_model->get_product_attr_name_by_id($product_attr_id);
-
-                foreach ($product_attr_details as $product_attr_detail)
-                {
-                    $data['product_attribute_detail_value'][] = $product_attr_detail;
-                    $data[$product_attr][] = $this->product_attribute_detail_model->get_product_attribute_detail_name_by_id($product_attr_detail);
-                }
-            }
-            else
-            {
-                $data['product_attribute_detail_value'][] = $product_attr_details;
-                $product_attr = $this->product_attribute_model->get_product_attr_name_by_id($product_attr_id);
-                $data[$product_attr][] = $this->product_attribute_detail_model->get_product_attribute_detail_name_by_id($product_attr_details);
-            }
-
-            $count++;
-        }
-
-        $data['id'] = $id;
-        $data['category'] =  $category['category'];
-        $data['category_id'] =  $category_id;
-
-        $json_data = json_encode($data);
-
-        $this->elasticsearch->add("products", "product", $id, $json_data);
-
-        $this->elasticsearch->refresh_index_type('products', 'product', $id);
-
-    }
-
     public function get_attr_details_count() {
         foreach ($this->input->post() as $key => $value) {
             if("submitted_product_attr_details_" == substr($key,0,31)){
@@ -575,12 +427,42 @@ class Product_model extends CI_Model {
         return $q->result_array()[0];
     }
 
-    public function get_product_by_id_db($id) {
-        $q = $this->db->select('`id`, `name`, `category` AS `category_id`, `image`, `profile_image`, `thumbnail`,
-        ')
-        ->from('`product`')
-        ->where('`id`', $id)
-        ->get();
-        return $q->result_array()[0];
+    public function get_product_by_id($id, $return_data_with_joins=FALSE, $only_category_join=FALSE, $only_product_attributes=FALSE) {
+        if($only_category_join) {
+            $this->db->select('`product`.`id`, `product`.`name`, `category`.`name` AS `category`, `product`.`profile_image`,
+            `product`.`short_description`, `product`.`long_description`');
+        }
+        else if($only_product_attributes) {
+            $this->db->select('`product`.`id`, `product`.`name`');
+        }
+        else {
+            $this->db->select('`product`.`id`, `product`.`name`, `product`.`category`, `product`.`image`, `product`.`profile_image`, `product`.`thumbnail`');
+        }
+        $this->db->from('product');
+        if($only_category_join) {
+            $this->db->join('`category`', '`product`.`category` = `category`.`id`', 'left');
+        }
+        $this->db->where('`product`.`id`', $id);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $result = $query->result_array();
+            if($return_data_with_joins || $only_product_attributes) {
+                $result = $this->get_attachments($result, $return_data_with_joins, $only_product_attributes);
+            }
+            return $result[0];
+        }
+        return FALSE;
+    }
+
+    public function get_product_desc_by_prod_id($id) {
+        $this->db->select('`product`.`id`, `product`.`name`, `product`.`short_description`, `long_description`');
+        $this->db->from('product');
+        $this->db->where('`product`.`id`', $id);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $result = $query->result_array();
+            return $result[0];
+        }
+        return FALSE;
     }
 }

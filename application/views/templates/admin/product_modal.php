@@ -13,7 +13,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" onclick="closeModel()" aria-hidden="true">×</button>
-                <h4 class="text-center"><?= ($action = $this->input->post('action')) == 'delete' ? "Are You Sure?" : "User Details"; ?></h4>
+                <h4 class="text-center"><?= ($action = $this->input->post('action')) == 'delete' ? "Are You Sure?" : "Product Details"; ?></h4>
             </div>
 
             <!-- modal-body -->
@@ -36,12 +36,11 @@
                                     <th class="text-center">Long Description</th>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($record as $product): ?>
                                     <tr>
-                                        <td><?= custom_echo($product, 'name'); ?></td>
-                                        <td><?= custom_echo($product, 'category'); ?></td>
-                                        <td><?= custom_echo($product, 'short_description'); ?></td>
-                                        <td><?= custom_echo($product, 'long_description'); ?></td>
+                                        <td class="text-center"><?= ucwords($product['name']); ?></td>
+                                        <td class="text-center"><?= ucwords($product['category']); ?></td>
+                                        <td class="text-justify"><?= stripcslashes(ucwords($product['short_description'])); ?></td>
+                                        <td class="text-justify"><?= stripcslashes(ucwords($product['long_description'])); ?></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -56,11 +55,10 @@
                     <button type="button" class="btn btn-default" onclick="closeModel()"><?= ($action) == 'delete' ? "Cancel" : "Close" ?></button>
                     <?php
                     if($action == 'delete'): ?>
-                        <a href="<?= site_url('admin/product/delete_product_by_id_lookup/' . custom_echo($product, 'id')); ?>" class="btn btn-danger">Delete</a>
+                        <a href="<?= site_url('admin/product/delete_product_by_id_lookup/' . $product['id']); ?>" class="btn btn-danger">Delete</a>
                     <?php endif; ?>
                 </div>
             </div>  <!-- end modal-footer -->
-            <?php endforeach ?>
         </div>
     </div>
 

@@ -1,14 +1,12 @@
  <div id="page-wrapper">
     <div class="row">
 
-        <?php foreach ($record as $product_desc): ?>
-
         <?= $tabs ?>
 
         <div class="col-lg-12">
                 <!-- Form -->
 
-            <?= form_open_multipart('admin/product/edit_product_description_lookup/' . custom_echo($product_desc, 'id'), 'class=form id=edit_product_desc_form novalidate'); ?>
+            <?= form_open_multipart('admin/product/edit_product_description_lookup/' . $product['id'], 'class=form id=edit_product_desc_form novalidate'); ?>
             <h1 class="page-header text-center"><?= $layout_title ?></h1>
 
         <!-- Short Description -->
@@ -24,7 +22,7 @@
                     'name'          => 'short_description',
                     'rows'          => 5,
                     'id'            => 'short_description',
-                    'value'         => custom_echo($product_desc, 'short_description')
+                    'value'         => stripcslashes(ucwords($product['short_description']))
                 );
                 ?>
 
@@ -48,7 +46,7 @@
                     'name'          => 'long_description',
                     'rows'          => 15,
                     'id'            => 'long_description',
-                    'value'         => custom_echo($product_desc, 'long_description')
+                    'value'         => stripcslashes(ucwords($product['long_description']))
                 );
                 ?>
 
@@ -71,5 +69,4 @@
 
     </div>
     </div> <!-- row -->
-     <?php endforeach ?>
 </div> <!-- page-wrapper -->

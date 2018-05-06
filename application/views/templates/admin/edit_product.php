@@ -1,13 +1,11 @@
  <div id="page-wrapper">
     <div class="row">
 
-        <?php foreach ($record as $product): ?>
-
         <?= $tabs ?>
 
         <div class="col-lg-8">
             <!-- Form -->
-            <?= form_open_multipart('admin/product/edit_product_lookup/' . custom_echo($product, 'id'), 'class=form id=edit_product_form novalidate'); ?>
+            <?= form_open_multipart('admin/product/edit_product_lookup/' . $product['id'], 'class=form id=edit_product_form novalidate'); ?>
             <h1 class="page-header text-center"><?= $layout_title ?></h1>
 
         <!-- Name -->
@@ -23,7 +21,7 @@
                             'class'         => 'form-control',
                             'name'          => 'name',
                             'id'            => 'name',
-                            'value'         => custom_echo($product, 'name')
+                            'value'         => ucwords($product['name'])
 
                         );
                     ?>
@@ -68,7 +66,7 @@
                         }
                     }
 
-                    $selected = custom_echo($product, 'category_id');
+                    $selected = $product['category'];
 
                 ?>
                 <?= form_dropdown('category', $options, $selected, $data); ?>
@@ -77,12 +75,11 @@
 
         </div>
 
-        <?php $selected_product_attributes = custom_echo($product, 'product_attribute_detail_id', 'no_case_change'); ?>
+        <?php $selected_product_attributes = array_unique(array_column($product['product_details'], 'product_attribute_detail_id')); ?>
 
         <?php $count = 1; ?>
 
         <?php foreach($selected_product_attributes as $selected_product_attribute): ?>
-
         <!-- Product Attribute -->
         <div class="col-lg-6 form-item-height">
             <div class="form-group">
@@ -115,8 +112,7 @@
                 <div id="product_attribute_<?= $count . '_error' ?>"></div>
             </div>
         </div>
-
-        <input type="hidden" id="product_attribute_detail_value" value="<?= implode(', ', custom_echo($product, 'product_attribute_detail_value', 'no_case_change')); ?>">
+        <input type="hidden" id="product_attribute_detail_value" value="<?= implode(', ', array_column($product['product_details'], 'product_attribute_detail_value')); ?>">
 
         <!-- Product Attribute Details -->
 
@@ -151,7 +147,7 @@
             endforeach;
         ?>
 
-        <div class="text-right" style="margin-right: 15px;">
+        <div class="text-right" style="margin-right: 15px;margin-bottom: 15px">
             <div id="loader">
                 <img style="margin: 0 auto;" class="img img-responsive" src="<?= ADMIN_IMAGES_PATH . 'loader.gif' ?>" alt="">
             </div>
@@ -183,7 +179,7 @@
         <!-- Image Preveiw -->
         <div id="image_preview">
             <div id="message" class="text-center"></div>
-            <img class="img-responsive previewing fadein img-rounded" id="previewing" src="<?= PRODUCT_IMAGE . custom_echo($product, 'image', 'no_case_change'); ?>" />
+            <img class="img-responsive previewing fadein img-rounded" id="previewing" src="<?= PRODUCT_IMAGE . $product['image']; ?>" />
             <div id="loading">
                 <img class="img-responsive" src="<?= ADMIN_IMAGES_PATH; ?>/coursera_ditto.gif" />
             </div>
@@ -202,5 +198,4 @@
 
     </div> <!-- image_section -->
     </div> <!-- row -->
-     <?php endforeach ?>
 </div> <!-- page-wrapper -->

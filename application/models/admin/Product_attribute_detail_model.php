@@ -1,15 +1,4 @@
 <?php  
-    /**
-    * Politician_model class is model of product_attribute_detail controller it performs 
-    * basic CRUD operations
-    * Methods: insert_product_attribute_detail
-    *          update_product_attribute_detail
-    *          delete_product_attribute_detail
-    *          get_product_attribute_detail_by_id
-    *          get_attachments
-    *          record_count
-    *          fetch_product_attribute_detail
-    */
 
 	class Product_attribute_detail_model extends CI_Model {
 

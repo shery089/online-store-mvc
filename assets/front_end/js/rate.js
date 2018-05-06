@@ -3,11 +3,11 @@
 //     // http://localhost
 
 //     var pathname = window.location.pathname;
-//     // /pak_democrates/admin/user/add_user_lookup
+//     // /ims/admin/user/add_user_lookup
 
 //     var path_parts = pathname.split('/');
-//     var base_url = origin + '/pak_democrates/f/';
-//     var base_url_admin = origin + '/pak_democrates/admin/';
+//     var base_url = origin + '/ims/f/';
+//     var base_url_admin = origin + '/ims/admin/';
 // 	var isLoggedIn = $.cookie('isLoggedIn');
 // 	if(isLoggedIn == 'true')
 // 	{

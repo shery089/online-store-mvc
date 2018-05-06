@@ -30,9 +30,9 @@ class Role extends PD_Photo {
 	 * generates pagination from other records
 	 * 
 	 * Maps to the following URL
-	 * 		http://localhost/pak_democrates/admin/role/index
+	 * 		http://localhost/ims/admin/role/index
 	 *	- or -
-	 *		http://localhost/pak_democrates/index.php/admin/role
+	 *		http://localhost/ims/index.php/admin/role
 	 * So any other public methods not prefixed with an underscore will
 	 * map to /index.php/admin/role/<method_name>
 	 *	- or -

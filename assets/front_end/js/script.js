@@ -10,11 +10,11 @@
     // http://localhost
 
     var pathname = window.location.pathname;
-    // /pak_democrates/admin/user/add_user_lookup
+    // /ims/admin/user/add_user_lookup
     var path_parts = pathname.split('/');
-    var base_url = origin + '/pak_democrates/f/';
-    var base_url_admin = origin + '/pak_democrates/admin/';
-    // "http://localhost/pak_democrates/f"
+    var base_url = origin + '/ims/f/';
+    var base_url_admin = origin + '/ims/admin/';
+    // "http://localhost/ims/f"
 
     // from a jQuery collection
     autosize($('textarea'));
@@ -391,7 +391,7 @@
     }
 
     $img.attr({
-      src: 'http://localhost/pak_democrates/assets/admin/images/'+ folder +'/' + item.icon,
+      src: 'http://localhost/ims/assets/admin/images/'+ folder +'/' + item.icon,
       alt: item.value,
       style: 'padding: 5px;'
     });
@@ -708,7 +708,7 @@
                                 x: j,
                                 label: ucwords(element.name) + ' ( ' + acronym.toUpperCase() + ')',
                                 y: Number(element.likes),
-                                name: "http://localhost/pak_democrates/f/politician/get_politician_by_id/" + element.id
+                                name: "http://localhost/ims/f/politician/get_politician_by_id/" + element.id
                             });
                         j++;
                     });
@@ -2397,7 +2397,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2536,7 +2536,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2636,7 +2636,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2734,7 +2734,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2829,7 +2829,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2906,7 +2906,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -2983,7 +2983,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 
@@ -3025,7 +3025,7 @@
      * and updating data to the database]
      * @param  {[type]} formId   [form id e.g. 'add_user_form' with out hash]
      * @param  {[type]} redirectPath [redirect path with protocol and host 
-     * e.g '/pak_democrates/f/user/']
+     * e.g '/ims/f/user/']
      * @return {[type]} false [e.preventDefault(); e.stopPropagation(); 
      * To prevent event from propagating (or "bubbling up") the DOM. So 
      * parent element event won;t trigger 

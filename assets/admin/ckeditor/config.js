@@ -14,9 +14,9 @@ CKEDITOR.editorConfig = function( config ) {
 	config.pasteFromWordRemoveFontStyles = true;
 	config.pasteFromWordRemoveStyles = true;
 	config.pasteFromWordNumberedHeadingToList = true;
-	config.filebrowserImageBrowseUrl = 'http://localhost/pak_democrates/assets/admin/kcfinder/browse.php?opener=ckeditor&type=images';
-	config.filebrowserFlashBrowseUrl = 'http://localhost/pak_democrates/assets/admin/kcfinder/browse.php?opener=ckeditor&type=flash';
-	config.filebrowserUploadUrl = 'http://localhost/pak_democrates/assets/admin/kcfinder/upload.php?opener=ckeditor&type=files';
-	config.filebrowserImageUploadUrl = 'http://localhost/pak_democrates/assets/admin/kcfinder/upload.php?opener=ckeditor&type=images';
-	config.filebrowserFlashUploadUrl = 'http://localhost/pak_democrates/assets/admin/kcfinder/upload.php?opener=ckeditor&type=flash';
+	config.filebrowserImageBrowseUrl = 'http://localhost/ims/assets/admin/kcfinder/browse.php?opener=ckeditor&type=images';
+	config.filebrowserFlashBrowseUrl = 'http://localhost/ims/assets/admin/kcfinder/browse.php?opener=ckeditor&type=flash';
+	config.filebrowserUploadUrl = 'http://localhost/ims/assets/admin/kcfinder/upload.php?opener=ckeditor&type=files';
+	config.filebrowserImageUploadUrl = 'http://localhost/ims/assets/admin/kcfinder/upload.php?opener=ckeditor&type=images';
+	config.filebrowserFlashUploadUrl = 'http://localhost/ims/assets/admin/kcfinder/upload.php?opener=ckeditor&type=flash';
 };

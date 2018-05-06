@@ -2,22 +2,14 @@
  * Inventory Management System Main JS file
  * Author: Sheryar Ahmed
  * Email: sheryarahmed@gmail.com
- * Created On: 02/12/2017 mm-dd-yyyy
- * Last-Modified: 02/12/2017 mm-dd-yyyy
+ * Created On: 04/29/2018 mm-dd-yyyy
  */
 
 /*====================================================
- =            document.ready comment block            =
+ =            document.ready comment block           =
  ====================================================*/
 
 $(function() {
-    /*    CKEDITOR.replace('introduction', {
-     filebrowserUploadUrl: "http://localhost/assets/admin/images/upload.php"
-     }
-     );*/
-
-    // $.removeCookie("isLoggedIn", { path: '/' });
-    // $.removeCookie("user", { path: '/' });
 
     var url = window.location;
     // http://localhost/admin/user/add_user_lookup
@@ -42,40 +34,6 @@ $(function() {
     $('#side-menu').metisMenu();
 
     var loading = $('#loading');
-
-    if($(this).width() < 400) {
-        $("a:contains('Add New')").parent().toggleClass('text-left').toggleClass('text-center')
-            .removeAttr('style').children().addClass('marg-bot-10');
-        $("a:contains('Indice')").toggleClass('pull-right').toggleClass('text-center');
-    }
-
-    if($.inArray('edit_product_lookup', path_parts) !== -1) {
-        $(".nav-pills li a:contains('Product Details')").parent().addClass('active');
-    }
-
-    if($.inArray('edit_product_description_lookup', path_parts) !== -1) {
-        $(".nav-pills li a:contains('Product Description')").parent().addClass('active');
-    }
-
-    if($.inArray('add_gallery_pics_lookup', path_parts) !== -1) {
-        $(".nav-pills li a:contains('Add New Product Images')").parent().addClass('active');
-    }
-
-    if(path_parts[4] == 'edit_product_lookup') {
-        var count = $('[id^="product_attribute_"] option:selected').length;
-
-        for (var i = 0; i < count; i++) {
-            var product_attribute_id = $('[id^="product_attribute_"] option:selected').eq(i).val();
-            var selected_text = $('[id^="product_attribute_"] option:selected').eq(i).text().toLowerCase();
-            var id = $('[id^="product_attribute_"] option:selected').eq(i).parent().attr('id');
-            id = id.split('_');
-            id = id.pop();
-
-            var product_attribute_detail_values = $('#product_attribute_detail_value').val();
-
-            getProductDetailOptions(id, product_attribute_id, selected_text, product_attribute_detail_values);
-        }
-    }
 
     $(window).bind("load resize", function() {
         var topOffset = 50;
@@ -105,22 +63,6 @@ $(function() {
         } else {
             break;
         }
-    }
-
-    if(path_parts[4] == 'add_post_lookup' || path_parts[4] == 'edit_post_lookup')
-    {
-        CKEDITOR.replace('post');
-    }
-    if(path_parts[4] == 'add_column_lookup' || path_parts[4] == 'edit_column_lookup')
-    {
-        CKEDITOR.replace('column');
-    }
-
-    if(path_parts[2] == 'columnist')
-    {
-        var dateToday = new Date();
-        var yrCurrent = dateToday.getFullYear();
-        $("#dob").datepicker({dateFormat: 'yy-mm-dd', changeYear:true, changeMonth: true, minDate: -1893434400 ,maxDate: todayDate(), yearRange : '1910:'+yrCurrent});
     }
 
     var active_half_url = origin + '/' + url_parts;
@@ -229,9 +171,10 @@ $(function() {
      */
     $('#add_user_form').on('submit', function(e){
         e.preventDefault();
-        $('#add_user').addClass('disabled').attr('disabled', true);
+        var add_user = $('#add_user');
+        add_user.addClass('disabled').attr('disabled', true);
         createOrUpdateByAjax('add_user_form', '/admin/user/');
-        $('#add_user').removeClass('disabled').removeAttr('disabled');
+        add_user.removeClass('disabled').removeAttr('disabled');
     });
 
     /**
@@ -240,7 +183,10 @@ $(function() {
      */
     $('#edit_user_form').on('submit', function(e){
         e.preventDefault();
+        var edit_user = $('#edit_user');
+        edit_user.addClass('disabled').attr('disabled', true);
         createOrUpdateByAjax('edit_user_form', '/admin/user/');
+        edit_user.removeClass('disabled').removeAttr('disabled');
     });
 
     /**
@@ -308,7 +254,7 @@ $(function() {
 
         for(var i = 0; i < last_inserted_id; i++) {
 
-            var product_attribute_details = jQuery("#product_attr_details_" + (i + 1)).val(); //(i + 1) to get 0 + 1 => 1
+            var product_attribute_details = $("#product_attr_details_" + (i + 1)).val(); //(i + 1) to get 0 + 1 => 1
             var product_attribute = $('#product_attribute_' + (i + 1) + ' option:selected').val(); //(i + 1) to get 0 + 1 => 1
 
             $('<input>').attr({
@@ -340,7 +286,7 @@ $(function() {
 
         for(var i = 0; i < last_inserted_id; i++) {
 
-            var product_attribute_details = jQuery("#product_attr_details_" + (i + 1)).val(); //(i + 1) to get 0 + 1 => 1
+            var product_attribute_details = $("#product_attr_details_" + (i + 1)).val(); //(i + 1) to get 0 + 1 => 1
             var product_attribute = $('#product_attribute_' + (i + 1) + ' option:selected').val(); //(i + 1) to get 0 + 1 => 1
 
             $('<input>').attr({
@@ -433,7 +379,7 @@ $(function() {
          = form_multiselect newspaper comment block                  =
          ========================================================*/
 
-        var newspapers = jQuery("#newspaper").val();
+        var newspapers = $("#newspaper").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_newspaper',
@@ -447,7 +393,7 @@ $(function() {
          = form_multiselect newspaper comment block                  =
          ========================================================*/
 
-        var newspapers = jQuery("#newspaper").val();
+        var newspapers = $("#newspaper").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_newspaper',
@@ -472,7 +418,7 @@ $(function() {
          = form_multiselect product_atrributes comment block            =
          ========================================================*/
 
-        var product_atrributess = jQuery("#product_atrributes").val();
+        var product_atrributess = $("#product_atrributes").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_product_atrributes',
@@ -486,7 +432,7 @@ $(function() {
          = form_multiselect halqa comment block                  =
          ========================================================*/
 
-        var designations = jQuery("#halqa").val();
+        var designations = $("#halqa").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_halqa',
@@ -527,7 +473,7 @@ $(function() {
          = form_multiselect type comment block            =
          ========================================================*/
 
-        var politicians = jQuery("#politician").val();
+        var politicians = $("#politician").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_politician',
@@ -535,7 +481,7 @@ $(function() {
             value: politicians
         }).appendTo('#add_post_form');
 
-        var political_parties = jQuery("#political_party").val();
+        var political_parties = $("#political_party").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_political_party',
@@ -558,7 +504,7 @@ $(function() {
          = form_multiselect type comment block            =
          ========================================================*/
 
-        var politicians = jQuery("#politician").val();
+        var politicians = $("#politician").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_politician',
@@ -566,7 +512,7 @@ $(function() {
             value: politicians
         }).appendTo('#edit_post_form');
 
-        var political_parties = jQuery("#political_party").val();
+        var political_parties = $("#political_party").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_political_party',
@@ -589,7 +535,7 @@ $(function() {
          = form_multiselect designation comment block            =
          ========================================================*/
 
-        var designations = jQuery("#designation").val();
+        var designations = $("#designation").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_designation',
@@ -603,7 +549,7 @@ $(function() {
          = form_multiselect halqa comment block                  =
          ========================================================*/
 
-        var designations = jQuery("#halqa").val();
+        var designations = $("#halqa").val();
         $('<input>').attr({
             type: 'hidden',
             id: 'submitted_halqa',
@@ -752,12 +698,12 @@ $(function() {
             url: formId.attr('action'), // form action url
             type: formId.attr('method'), // form method e.g POST
             data: formData, // user un-encoded data
-            contentType: false, //it forces jQuery not to add a Content-Type header, otherwise, the boundary string will be missing from it
+            contentType: false, //it forces $ not to add a Content-Type header, otherwise, the boundary string will be missing from it
             processData: false, // to send non-processed data
             success: function (data) {
 
                 // Takes a well-formed JSON string and returns the resulting JavaScript value.
-                data = jQuery.parseJSON(data);
+                data = $.parseJSON(data);
                 if(data.success !== undefined)
                 {
                     window.location.href = origin + redirectPath;
@@ -853,7 +799,7 @@ $(function() {
     function submitImagesNames()
     {
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: base_url + '/admin/gallery/submit_images_names_lookup',
             method: 'post',
             success: function(data)
@@ -1099,14 +1045,14 @@ $(function() {
 
         var data = {'details': details};
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: url,
             method: 'post',
             data: data,
             success: function(data)
             {
                 // Takes a well-formed JSON string and returns the resulting JavaScript value.
-                data = jQuery.parseJSON(data);
+                data = $.parseJSON(data);
 
                 if(data.success !== undefined)
                 {
@@ -1130,13 +1076,13 @@ $(function() {
     {
         var data = {'action': action};
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: url,
             method: 'post',
             data: data,
             success: function(data)
             {
-                jQuery('body').append(data);
+                $('body').append(data);
                 $("#modal").modal({backdrop: "static", toggle: true});
             },
             error: function()
@@ -1156,14 +1102,14 @@ $(function() {
     {
         var data = {'role_id': id};
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: base_url + '/admin/user/search_user_lookup/',
             method: 'post',
             data: data,
             success: function(data)
             {
-                jQuery('#searched_results').empty();
-                jQuery('#searched_results').append(data);
+                $('#searched_results').empty();
+                $('#searched_results').append(data);
                 //$("#modal").modal({backdrop: "static", toggle: true});
             },
             error: function()
@@ -1187,12 +1133,12 @@ $(function() {
         var elemets_to_disable = $('#search_by_user_role, #search_by_user_full_name, #user_search_btn');
 
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: base_url + '/admin/user/search_user_lookup/',
             method: 'post',
             data: data,
             beforeSend: function() {
-                jQuery('#searched_results').empty();
+                $('#searched_results').empty();
                 elemets_to_disable.attr('disabled', true);
                 loading.show();
             },
@@ -1200,7 +1146,7 @@ $(function() {
             {
                 loading.hide();
                 elemets_to_disable.removeAttr('disabled');
-                jQuery('#searched_results').append(data);
+                $('#searched_results').append(data);
             },
             error: function()
             {
@@ -1221,14 +1167,14 @@ $(function() {
         var data = {'product_category': product_category, 'product_name': product_name};
         // calling ajax
 
-        jQuery.ajax({
+        $.ajax({
             url: base_url + '/admin/product/search_product_lookup/',
             method: 'post',
             data: data,
             success: function(data)
             {
-                jQuery('#searched_results').empty();
-                jQuery('#searched_results').append(data);
+                $('#searched_results').empty();
+                $('#searched_results').append(data);
                 //$("#modal").modal({backdrop: "static", toggle: true});
             },
             error: function()
@@ -1268,7 +1214,7 @@ $(function() {
 
         var data = {'id_prepend': id_prepend, 'options_arr': options_arr};
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: url,
             method: 'post',
             data: data,
@@ -1279,7 +1225,7 @@ $(function() {
             },
             success: function(data)
             {
-                jQuery('#add_new_product_attribute_section').parent().before(data);
+                $('#add_new_product_attribute_section').parent().before(data);
                 $('.selectpicker').selectpicker('refresh');
 
                 for(var i= 0, length = options_arr.length; i < length; i++){
@@ -1315,7 +1261,7 @@ $(function() {
             options_arr.splice(index, 1);
         }
 
-        options_arr = jQuery.grep(options_arr, function(n){ return (n); });
+        options_arr = $.grep(options_arr, function(n){ return (n); });
 
         return options_arr;
     }
@@ -1332,15 +1278,17 @@ $(function() {
 
     function getProductDetailOptions(id, product_attribute, selected_text, product_attribute_detail_values)
     {
-        base_url = base_url == undefined ? 'http://localhost/ims' : base_url;
         var url = base_url + '/admin/product/get_product_details_options';
 
         var product_attribute_detail_values = product_attribute_detail_values || '';
 
-        var data = {'product_attribute': product_attribute, 'selected_text': selected_text,
-            'product_attribute_detail_values': product_attribute_detail_values};
+        var data = {
+                'product_attribute': product_attribute, 'selected_text': selected_text,
+                'product_attribute_detail_values': product_attribute_detail_values
+            };
+
         // calling ajax
-        jQuery.ajax({
+        $.ajax({
             url: url,
             method: 'post',
             data: data,
@@ -1519,6 +1467,32 @@ $(function() {
         window.location = _this.attr('href');
     });
 
+    if($.inArray('edit_product_lookup', path_parts) !== -1) {
+        $(".nav-pills li a:contains('Product Details')").parent().addClass('active');
+    }
+
+    if($.inArray('edit_product_description_lookup', path_parts) !== -1) {
+        $(".nav-pills li a:contains('Product Description')").parent().addClass('active');
+    }
+
+    if($.inArray('add_gallery_pics_lookup', path_parts) !== -1) {
+        $(".nav-pills li a:contains('Add New Product Images')").parent().addClass('active');
+    }
+
+    if($.inArray('edit_product_lookup', path_parts) !== -1) {
+        var count = $('[id^="product_attribute_"] option:selected').length;
+
+        for (var i = 0; i < count; i++) {
+            var product_attribute_id = $('[id^="product_attribute_"] option:selected').eq(i).val();
+            var selected_text = $('[id^="product_attribute_"] option:selected').eq(i).text().toLowerCase();
+            var id = $('[id^="product_attribute_"] option:selected').eq(i).parent().attr('id');
+            id = id.split('_');
+            id = id.pop();
+
+            var product_attribute_detail_values = $('#product_attribute_detail_value').val();
+            getProductDetailOptions(id, product_attribute_id, selected_text, product_attribute_detail_values);
+        }
+    }
 });
 
 /*=====  End of document.ready comment block  ====== */

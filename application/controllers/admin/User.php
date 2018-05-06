@@ -23,22 +23,6 @@ class User extends PD_Photo
 		$this->load->model('admin/role_model');
 	}
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * It retrieves $config['per_page'] users from the database and
-	 * generates pagination from other records
-	 *
-	 * Maps to the following URL
-	 *        http://localhost/pak_democrates/admin/user/index
-	 *    - or -
-	 *        http://localhost/pak_democrates/index.php/admin/user
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/admin/user/<method_name>
-	 *    - or -
-	 * /admin/user/<method_name>
-	 */
-
 	public function index()
 	{
 		$this->unset_user_search_filter();
@@ -627,36 +611,6 @@ class User extends PD_Photo
 		}
 	}
 
-	/**
-	 * [is_unique It's a callback function that is called in edit_user_lookup
-	 * validation it checks if same attribute data exists other than the current
-	 * current record than returns FALSE. If does not exists it returns TRUE]
-	 * @param  [string] $value  [User entered value e.g. in case of email validation
-	 * sheryarahmed007@gmail.com]
-	 * @param  [string] $params [table.attribute.id e.g. user.email.3]
-	 * @return [type]  [if same data exists other than current record then, returns
-	 * FALSE. If it doesn't exists other than current record then, returns TRUE.]
-	 */
-	public function is_unique($value, $field)
-	{
-		$this->form_validation->set_message('is_unique',
-				'The %s is not available');
-
-		$query = '{
-		  "query": {
-			"bool" : {
-			  "must" : {
-				"term" : { "' . $field . '" : "' . strtolower($value) . '" }
-			  }
-			}
-		  }
-		}';
-
-		$user = $this->elasticsearch->advancedquery('users', 'user', $query);
-
-		return !empty($user['hits']['hits']) ? FALSE : TRUE;
-	}
-
     /**
      * [edit_unique It's a callback function that is called in edit_user_lookup
      * validation it checks if same attribute data exists other than the current
@@ -828,13 +782,6 @@ class User extends PD_Photo
 		}
 	}
 
-	public function create_user_mapping() {
-
-		$this->load->library('user_mapping');
-		$mapping = $this->user_mapping->create_user_mapping();
-		$this->elasticsearch->create('users', $mapping);
-	}
-
 	public function search_user_lookup() {
 
 		$this->get_user_search_filter();
@@ -923,9 +870,7 @@ class User extends PD_Photo
 			);
 		}
 
-		if(isset($users)) {
-			return $users;
-		}
+		if(isset($users)) return $users;
 	}
 
 	/**

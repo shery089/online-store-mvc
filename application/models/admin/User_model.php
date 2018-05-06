@@ -249,11 +249,11 @@
 
             if(isset($params['role_id'])) {
                 if(!empty($params['role_id'])) {
-                    $this->db->where('role_id',$params['role_id']);
+                    $this->db->where('`role_id`',$params['role_id']);
                 }
             }
 
-            $this->db->from('user');
+            $this->db->from('`user`');
 
             $query = $this->db->get();
             $result = $query->result_array();

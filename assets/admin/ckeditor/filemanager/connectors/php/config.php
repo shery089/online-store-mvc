@@ -36,7 +36,7 @@ $Config['UserFilesPath'] = '/assets/admin/images/' ;
 // user files directory. Useful if you are using a virtual directory, symbolic
 // link or alias. Examples: 'C:\\MySite\\userfiles\\' or '/root/mysite/userfiles/'.
 // Attention: The above 'UserFilesPath' must point to the same directory.
-$Config['UserFilesAbsolutePath'] = 'C:\\xampp\\htdocs\\pak_democrates\\assets\\admin\\images' ;
+$Config['UserFilesAbsolutePath'] = 'C:\\xampp\\htdocs\\ims\\assets\\admin\\images' ;
 
 // Due to security issues with Apache modules, it is recommended to leave the
 // following setting enabled.

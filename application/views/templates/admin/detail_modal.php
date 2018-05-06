@@ -17,33 +17,20 @@
             </div>
 
             <!-- modal-body -->
-            <div class="modal-body no-padding">
+            <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-sm-12 no-padding">
-                            <div class="table-responsive">
-<!--                                <table class="table table-bordered table-condensed table-striped admin-table">-->
-<!--                                    <thead>-->
-                                    <?php foreach ($product_attributes as $product_attribute): ?>
-                                        <?php foreach ($record as $product): ?>
-                                            <?php if(in_array_r($product_attribute, $product)): ?>
-<!--                                                <th>--><?//= ucwords($product_attribute); ?><!--</th>-->
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    <?php endforeach; ?>
-<!--                                    </thead>-->
-<!--                                    <tbody>-->
-<!---->
-<!--                                    <tr>-->
-                                    <?php foreach ($product_attributes as $product_attribute): ?>
-                                        <?php foreach ($record as $product): ?>
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-condensed table-striped admin-table">
+                                <div class="table-responsive" style="overflow-x: inherit !important;">
+                                        <?php foreach ($product_attributes as $product_attribute): ?>
                                             <?php if(in_array_r($product_attribute, $product)): ?>
                                                     <?php
                                                         switch($product_attribute) {
                                                             case 'color': ?>
                                                                 <h4 style="margin-top: 15px;"><?= ucwords($product_attribute) ?></h4>
                                                                 <?php
-                                                                foreach(custom_echo($product, $product_attribute, 'no_case_change') as $color):
+                                                                foreach($product[$product_attribute] as $color):
                                                                 ?>
                                                                     <span style="border-style: outset; padding: 5px 20px; margin-right: 5px; background: <?= $color; ?>"></span>
                                                                 <?php
@@ -52,7 +39,7 @@
                                                             case 'size': ?>
                                                                 <h4 style="margin-top: 15px;"><?= ucwords($product_attribute) ?></h4>
                                                                 <?php
-                                                                foreach(custom_echo($product, $product_attribute, 'no_case_change') as $size):
+                                                                foreach($product[$product_attribute] as $size):
                                                                 ?>
                                                                     <span><?= strtoupper($size); ?></span>
 
@@ -62,11 +49,11 @@
                                                             default: ?>
                                                                 <h4 style="margin-top: 15px;"><?= ucwords($product_attribute) ?></h4>
                                                                 <?php
-                                                                foreach(custom_echo($product, $product_attribute, 'no_case_change') as $attr):
+                                                                foreach($product[$product_attribute] as $attr):
                                                                 ?>
-                                                                <h2>
+                                                                <h4>
                                                                     <span><?= $attr; ?></span>
-                                                                </h2>
+                                                                </h4>
                                                                 <?php
                                                                 endforeach;
                                                                 break;
@@ -74,11 +61,8 @@
                                                     ?>
                                                  <?php endif; ?>
                                             <?php endforeach; ?>
-                                        <?php endforeach; ?>
-<!--                                    </tr>-->
-<!--                                    </tbody>-->
-<!--                                </table>-->
-                            </div>
+                                </div>
+                            </table>
                         </div>
                     </div>
                 </div>
