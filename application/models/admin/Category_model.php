@@ -13,22 +13,6 @@
 
     class Category_model extends CI_Model {
 
-        private $name,
-                $introduction,
-                $dob,
-                $newspaper,
-                $image,
-                $thumbnail,
-                $city,
-                $profile_image;
-
-        public function __construct()
-        {
-            parent::__construct();          
-            $this->load->model('admin/newspaper_model');
-            $this->load->model('admin/autocomplete_model');
-        }
-
         /**
          * [insert_category: Inserts a category record into the database]
          * @param  [string] $flag [New random flag name]

@@ -1,5 +1,6 @@
  <div id="page-wrapper">
     <div class="row">
+        <?= $tabs; ?>
         <div class="col-lg-12">
    			<?php if($this->session->flashdata('success_message') OR $this->session->flashdata('delete_message')): ?>
    				<p class="alert <?= ($this->session->flashdata('delete_message')) ? 'alert-danger' : 'alert-success' ?> alert-dismissable fade in text-center top-height">
@@ -29,7 +30,7 @@
         <div class="col-lg-12">
 			<!-- Add User Button -->
 			<div class="form-group text-left">
-				<a href="<?= site_url('admin/gallery/add_gallery_pics_lookup'); ?>" class="btn btn-primary">Add New</a>
+<!--				<a href="--><?//= site_url('admin/gallery/add_gallery_pics_lookup'); ?><!--" class="btn btn-primary">Add New</a>-->
 			</div>
      		<?php if(!empty($pictures)): ?>
 			<div class="table-responsive">
@@ -57,7 +58,7 @@
 				   			<td><?= ucwords(entity_decode($picture['full_name'])); ?></td>
 				   			<td><?= entity_decode($picture['uploaded_date']); ?></td>
 				   			<td style="display: inline-grid; margin-left: 10px;margin-top: 10px;">
-				   				<a href="<?= base_url('admin/gallery/edit_gallery_pics_lookup/') . '/' . $picture['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
+				   				<a href="<?= base_url('admin/gallery/edit_gallery_pics_lookup') . '/' . $picture['product_id'] . '/' . $picture['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
 								<a href="javascript:void(0)" id="delete_<?= $picture['id']; ?>" class="btn btn-sm btn-danger actions"><span class="fa fa-trash"></span></a>
 				   				<a href="javascript:void(0)" id="view_<?= $picture['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   				<a href="javascript:void(0)" id="feature_<?= $picture['id'] . '_' . $status ?>" class="btn btn-sm btn-primary actions"><span class="<?= $status == 0 ? 'fa fa-plus' : 'fa fa-minus'; ?>"></span></a>
@@ -67,7 +68,6 @@
 				    </tbody>
 				</table>
 			</div>
-			<?= $links ?>
 			<?php else: ?>
 	  			<h3 class="text-center">Sorry No Record Found!</h3>
 	  		<?php endif; ?>

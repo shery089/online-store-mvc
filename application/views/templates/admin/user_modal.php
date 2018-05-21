@@ -36,7 +36,7 @@
                                         <tr>
                                             <td class="text-center"><?= ucwords($user['full_name']); ?></td>
                                             <td class="text-center"><?= ucwords($user['user_name']); ?></td>
-                                            <td class="text-center"><?= ucwords($user['email']); ?></td>
+                                            <td class="text-center"><?= $user['email']; ?></td>
                                             <td class="text-center"><?= ucwords($user['mobile_number']); ?></td>
                                             <td class="text-center"><?= ucwords($user['role']); ?></td>
                                             <td class="text-center"><?= ucwords($user['joined_date']); ?></td>

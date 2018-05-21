@@ -18,23 +18,24 @@
 			</thead>
 			<tbody>
 			<?php foreach ($products as $product):?>
-				<tr>
-					<td style="padding: 0;width: 7% !important;text-align: center;"><img src="<?= PRODUCT_IMAGE  .  custom_echo($product, 'thumbnail', 'no_case_change'); ?>" alt=""></td>
-					<td><?= custom_echo($product, 'name'); ?></td>
-					<td><?= custom_echo($product, 'category'); ?></td>
-					<td>
-						<a title="Edit Product" href="<?= base_url('admin/product/edit_product_lookup/') . '/' . custom_echo($product, 'id'); ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-						<a title="Edit Product Description" href="<?= base_url('admin/product/edit_product_description_lookup/') . '/' . custom_echo($product, 'id'); ?>" class="btn btn-sm btn-primary actions"><span class="glyphicon glyphicon-pencil"></span></a>
-						<a title="Delete Product" href="javascript:void(0)" id="delete_<?= custom_echo($product, 'id'); ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
-						<a title="Product Description" href="javascript:void(0)" id="view_<?= custom_echo($product, 'id'); ?>" class="btn btn-sm btn-info actions"><span class="fa fa-file-o"></span></a>
-						<a title="Product Attributes" href="javascript:void(0)" id="details_<?= custom_echo($product, 'id'); ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
-					</td>
-				</tr>
+                <tr>
+                    <td style="padding: 0;width: 7% !important;text-align: center;"><img src="<?= PRODUCT_IMAGE  .  ucwords($product['thumbnail']); ?>" alt="Product Image"></td>
+                    <td><?= ucwords($product['name']); ?></td>
+                    <td><?= ucwords($product['category']); ?></td>
+                    <td>
+                        <a title="Edit Product" href="<?= base_url('admin/product/edit_product_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-square-o"></span></a>
+                        <a title="Product Gallery" href="<?= base_url('admin/gallery/add_gallery_pics_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-warning actions" style="display: inline-block;"><span class="fa fa-photo"></span></a>
+                        <a title="Edit Product Description" href="<?= base_url('admin/product/edit_product_description_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-primary actions" style="display: inline-block;"><span class="fa fa-pencil-square"></span></a>
+                        <a title="Delete Product" href="javascript:void(0)" id="delete_<?= ucwords($product['id']); ?>" class="btn btn-sm btn-danger actions" style="display: inline-block;"><span class="fa fa-close"></span></a>
+                        <a title="Product Description" href="javascript:void(0)" id="view_<?= ucwords($product['id']); ?>" class="btn btn-sm btn-info actions" style="display: inline-block;"><span class="fa fa-comment-o "></span></a>
+                        <a title="Product Attributes" href="javascript:void(0)" id="details_<?= ucwords($product['id']); ?>" class="btn btn-sm btn-info actions" style="display: inline-block;"><span class="fa fa-eye"></span></a>
+                    </td>
+                </tr>
 			<?php endforeach; ?>
 			</tbody>
 		</table>
-	</div>
-
+        <?= $links ?>
+    </div>
 	<?php else: ?>
 		<h3 class="text-center">Sorry No Record Found!</h3>
 	<?php endif; ?>

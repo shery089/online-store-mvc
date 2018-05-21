@@ -15,6 +15,7 @@ class Product extends PD_Photo {
 	}
 	public function index()
 	{
+        $this->unset_product_search_filter();
 		if($this->input->is_ajax_request()) {
 			$this->search_product_lookup();
 		}
@@ -26,7 +27,7 @@ class Product extends PD_Photo {
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = USERS_PER_PAGE;
+		$config['per_page'] = PRODUCTS_PER_PAGE;
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$config["total_rows"] = $this->product_model->record_count();
@@ -200,7 +201,7 @@ class Product extends PD_Photo {
 
 			if($this->product_model->insert_product($image_name, $image_thumb_name, $profile_image_name)) // insert into db
 			{
-				$this->session->set_flashdata('success_message', 'Product ' . ucwords($this->input->post('name')) . ' has been successfully added!');
+				$this->session->set_flashdata('success_message', 'Product <strong>' . ucwords($this->input->post('name')) . '</strong> has been successfully added!');
 				unset($_POST);
 				unset($_FILES);
 		    	echo json_encode(array('success' => 'Product inserted'));
@@ -384,9 +385,8 @@ class Product extends PD_Photo {
 		$product_attributes = $this->product_attribute_model->get_product_attributes_dropdown();
 		$data['product_attributes'] = $product_attributes;
 
-        $data['product'] = $product = $this->get_product_by_id_lookup($id);
+        $data['product'] = $product = $this->get_product_by_id_lookup($id, FALSE, FALSE, FALSE, TRUE);
 		$data['tabs'] = $this->load->view('templates/admin/product_nav_tabs', $data, TRUE);
-
 		if ($this->form_validation->run() === FALSE) // Validation fails
 	    {
 			/**
@@ -568,10 +568,10 @@ class Product extends PD_Photo {
 		return $political_parties;
 	}
 
-	public function get_product_by_id_lookup($id, $return_data_with_joins = FALSE, $only_category_join=FALSE, $only_product_attributes=FALSE)
+	public function get_product_by_id_lookup($id, $return_data_with_joins = FALSE, $only_category_join=FALSE, $only_product_attributes=FALSE, $return_data_without_joins=FALSE)
 	{
 //        $this->unset_user_search_filter();
-        $product = $this->product_model->get_product_by_id($id, $return_data_with_joins, $only_category_join, $only_product_attributes);
+        $product = $this->product_model->get_product_by_id($id, $return_data_with_joins, $only_category_join, $only_product_attributes, $return_data_without_joins);
         return $product;
 	}
 
@@ -583,6 +583,7 @@ class Product extends PD_Photo {
 
 		if ($this->product_model->delete_product($id))
 		{
+            $this->session->set_flashdata('delete_message', 'Record has been successfully deleted!');
 		    redirect('/admin/product/');
 		}
 	}
@@ -590,129 +591,39 @@ class Product extends PD_Photo {
 	public function product_name_autocomplete()
 	{
 		$product_name = trim(strtolower($this->input->post('product_name')));
-		$product_name = str_replace('-', ' - ', $product_name);
 
-		$source = '"_source": {
-				"includes": [ "name"]
-				},';
+        $product_names = $this->product_model->product_full_name_autocomplete($product_name);
 
-		$query = '
-		{ ' .
+        $full_names = array();
 
-				$source
+        if(!empty($product_names)) {
+            foreach($product_names as $product_name) {
+                $full_names[] = ucwords($product_name['name']);
+            }
+        } else {
+            $full_names[] = 'No Results Found';
+        }
 
-				. '
-			"from" : 0, "size" : 6,
-				"query": {
-					"query_string":{
-						"query": '. '"*'.$product_name.'*"' .',
-						"fields": ["name"],
-						"default_operator": "AND"
-					}
-				}
-			}';
-
-		$products = $this->elasticsearch->advancedquery('products', 'product', $query);
-
-		$products = $products['hits']['hits'];
-
-		$product_names = [];
-
-		if(!empty($products)) {
-			foreach($products as $product) {
-				$product_names[] = custom_echo($product, 'name');
-			}
-		} else {
-			$product_names[] = 'No Results Found';
-		}
-
-		echo json_encode($product_names);
-	}
-
-	public function indice_product_elastic_search_lookup() {
-		$time_taken_sec = $this->insert_product_bulk_elasticsearch_lookup(FALSE);
-		$this->elasticsearch->refresh_index_type('products');
-		$this->session->set_flashdata('success_message', 'Product Indexing is successfully completed');
-		sleep($time_taken_sec/1000); // millseconds
-			redirect('admin/product');
-	}
-
-	/**
-	 * [insert_product_bulk_elasticsearch_lookup This function will insert bulk of product data
-	 * from database to elasticsearch
-	 */
-	public function insert_product_bulk_elasticsearch_lookup($return_response = TRUE)
-	{
-		$product_attributes = $this->product_attribute_model->get_product_attributes_only_key('name');
-
-		$product_attributes = array_column($product_attributes, 'name');
-
-		$result = $this->product_model->insert_product_bulk_elasticsearch();
-
-		$result_keys = array_keys($result[0][1]);
-
-		$to_prepend_mapping_keys = array();
-
-		foreach($result_keys as $result_key) {
-			if(in_array($result_key, $product_attributes)) {
-				$to_prepend_mapping_keys[] = $result_key;
-			}
-		}
-
-		$result = json_encode($result);
-
-		$result = str_replace(",{", "\n\r{", $result);
-
-		$result = str_replace(array('[[', ']]'), '', $result);
-
-		$result = str_replace(',[{', "\n\r{", $result);
-
-		$result = str_replace(array(',}]', '}]'), "}", $result);
-
-		file_put_contents(JSON_FILE_PATH . '/results.json', $result);
-
-		$json_data = file_get_contents(JSON_FILE_PATH . "/results.json");
-		$json_data = str_replace(array('[[', ']]'), '', $json_data);
-		$json_data .= "\n\r";
-
-		unlink(JSON_FILE_PATH . '/results.json');
-
-		$this->elasticsearch->delete_index("products");
-
-		$this->create_product_mapping($to_prepend_mapping_keys);
-
-		$this->elasticsearch->create("products");
-
-		$response = $this->elasticsearch->insert_bulk("product", 'POST', $json_data);
-
-		if($return_response) {
-			echo json_encode($response);
-		}
-		else {
-			return $response['took'];
-		}
-	}
-
-	public function create_product_mapping($to_prepend_mapping_keys) {
-
-		$this->load->library('product_mapping');
-		$mapping = $this->product_mapping->create_product_mapping($to_prepend_mapping_keys);
-		$this->elasticsearch->create('products', $mapping);
+        echo json_encode($full_names);
 	}
 
 	public function search_product_lookup() {
+
+        $this->get_product_search_filter();
+
+        $this->set_product_search_filter();
 
 		$current_page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
 
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = USERS_PER_PAGE;
+		$config['per_page'] = PRODUCTS_PER_PAGE;
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$products = $this->fetch_products($config["per_page"], $current_page);
 
-		$config["total_rows"] = !empty($products['total']) ? $products['total'] : 0;
+		$config["total_rows"] = $this->products_count();
 
 		$config["num_links"] = 1;
 		$config['full_tag_open'] = '<ul class="pagination">';
@@ -732,7 +643,7 @@ class Product extends PD_Photo {
 
 		$data["links"] = $this->pagination->create_links();
 
-		$data["products"] = !empty($products['hits']) ? $products['hits'] : array();
+		$data["products"] = $products;
 
 		$this->load->view('templates/admin/search_products', $data);
 	}
@@ -750,7 +661,8 @@ class Product extends PD_Photo {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
-                    'category_id' => $product_category_ac_id
+                    'category' => $product_category_ac_id,
+                    'has_category_join' => TRUE
                 )
             );
 		}
@@ -759,7 +671,8 @@ class Product extends PD_Photo {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
-                    'name' => $product_name_ac
+                    'name' => $product_name_ac,
+                    'has_category_join' => TRUE
                 )
             );
 		}
@@ -769,8 +682,9 @@ class Product extends PD_Photo {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
-                    'category_id' => $product_category_ac_id,
-                    'name' => $product_name_ac
+                    'category' => $product_category_ac_id,
+                    'name' => $product_name_ac,
+                    'has_category_join' => TRUE
                 )
             );
 
@@ -787,4 +701,79 @@ class Product extends PD_Photo {
 
         if(isset($products)) return $products;
 	}
+
+    /**
+     * @return mixed Users count
+     *
+     */
+    public function products_count()
+    {
+        $category_cond = isset($_POST['product_category']) && is_numeric($_POST['product_category']);
+        $category = $this->input->post('product_category');
+        $product_name = strtolower($this->input->post('product_name'));
+        if($category_cond) {
+            $products = $this->product_model->record_count(array(
+                    'category' => $category
+                )
+            );
+        }
+
+        if(!empty($_POST['product_name'])) {
+            $products = $this->product_model->record_count(array(
+                    'name' => $product_name
+                )
+            );
+        }
+
+        if($category_cond && !empty($_POST['product_name'])) {
+            $products = $this->product_model->record_count(array(
+                    'category' => $category,
+                    'name' => $product_name
+                )
+            );
+        }
+
+        if(!$this->input->is_ajax_request()) {
+            $products = $this->product_model->record_count();
+        }
+
+        if(isset($products)) {
+            return $products;
+        }
+    }
+
+    public function set_product_search_filter() {
+        $product_category = trim($this->input->post('product_category'));
+        $product_name = trim($this->input->post('product_name'));
+        if(!empty($product_category) || !empty($product_name)) {
+            $this->session->set_userdata(array(
+                    'product_category' 	=> $product_category,
+                    'product_name' => $product_name
+                )
+            );
+        }
+    }
+
+    public function get_product_search_filter() {
+
+        $session_product_name = $this->session->userdata('product_name');
+        $product_name = $this->input->post('product_name');
+        $session_product_category = $this->session->userdata('product_category');
+        $product_category = $this->input->post('product_category');
+
+        if(empty($product_name)) {
+            $_POST['product_name'] = $session_product_name;
+        }
+
+        if(empty($product_category)) {
+            $_POST['product_category'] = $session_product_category;
+        }
+    }
+
+    public function unset_product_search_filter() {
+        $this->session->unset_userdata(array(
+                'product_name', 'product_category'
+            )
+        );
+    }
 }

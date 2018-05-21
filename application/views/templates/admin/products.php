@@ -28,7 +28,7 @@
     <div class="row">
         <div class="col-lg-12">
 
-			<div class="col-lg-4"></div>
+			<div class="col-lg-3"></div>
 			<div class="col-lg-4">
 				<div class="form-group custom-search-form">
 					<div class="form-group">
@@ -77,6 +77,10 @@
 				</div>
 			</div>
 
+            <div class="col-lg-1">
+                <a href="<?= base_url('admin/product') ?>" class="btn btn-warning" type="button">Reset <i class="fa fa-undo"></i></a>
+            </div>
+
 			<!-- Add Product Button -->
 			<div class="form-group text-left" style="margin-top: 55px">
 				<a href="<?= site_url('admin/product/add_product_lookup'); ?>" class="btn btn-primary">Add New</a>
@@ -117,8 +121,8 @@
 				    </tbody>
 				</table>
 			</div>
+                <?= $links ?>
 			</div>
-			<?= $links ?>
 			<?php else: ?>
 	  			<h3 class="text-center">Sorry No Record Found!</h3>
 	  		<?php endif; ?>

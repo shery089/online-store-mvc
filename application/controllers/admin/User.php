@@ -278,7 +278,7 @@ class User extends PD_Photo
 
 			if ($this->user_model->insert_user($image_name, $profile_image_name, $image_thumb_name)) // insert into db
 			{
-				$this->session->set_flashdata('success_message', 'User ' . ucfirst($this->input->post('first_name')) . ' ' . ucfirst($this->input->post('middle_name')) . ' ' . ucfirst($this->input->post('last_name')) . ' has been successfully added!');
+				$this->session->set_flashdata('success_message', 'User <strong>' . ucfirst($this->input->post('first_name')) . ' ' . ucfirst($this->input->post('middle_name')) . ' ' . ucfirst($this->input->post('last_name')) . '</strong> has been successfully added!');
 				unset($_POST);
 				unset($_FILES);
 				echo json_encode(array('success' => 'User inserted'));
@@ -479,9 +479,9 @@ class User extends PD_Photo
 
 			if($this->user_model->update_user($id, $image_name, $image_thumb_name, $profile_image_name))
 			{
-				$this->session->set_flashdata('success_message', 'User ' . ucfirst($this->input->post('first_name')) . ' ' .
+				$this->session->set_flashdata('success_message', 'User <strong>' . ucfirst($this->input->post('first_name')) . ' ' .
 						(!empty($this->input->post('middle_name')) ? ' ' . ucfirst($this->input->post('middle_name')) : '')
-						. ' ' . ucfirst($this->input->post('last_name')) . ' has been successfully updated!');
+						. ' ' . ucfirst($this->input->post('last_name')) . ' </strong> has been successfully updated!');
 				echo json_encode(array('success' => 'User Updated'));
 			}
 		}
@@ -603,7 +603,7 @@ class User extends PD_Photo
 
 			if ($this->user_model->change_password($current_user_id)) // insert into db
 			{
-				$this->session->set_flashdata('success_message', 'Password has been successfully changed!');
+				$this->session->set_flashdata('success_message', '<strong>Password</strong> has been successfully changed!');
 				unset($_POST);
 				unset($_FILES);
 				echo json_encode(array('success' => 'Password Changed'));
@@ -708,6 +708,8 @@ class User extends PD_Photo
 
 		$users = $this->user_model->user_full_name_autocomplete($full_name);
 
+        $full_names = array();
+
 		if(!empty($users)) {
 			foreach($users as $user) {
 				$full_names[] = ucwords($user['full_name']);
@@ -738,47 +740,6 @@ class User extends PD_Photo
 		if ($this->user_model->delete_user($id)) {
 			$this->session->set_flashdata('delete_message', 'Record has been successfully deleted!');
 			redirect('/admin/user/');
-		}
-	}
-
-	public function indice_user_elastic_search_lookup() {
-		$time_taken_sec = $this->insert_user_bulk_elasticsearch_lookup(FALSE);
-		$this->elasticsearch->refresh_index_type('users');
-		$this->session->set_flashdata('success_message', 'User Indexing is successfully completed');
-		sleep($time_taken_sec/1000); // millseconds
-		redirect('admin/user');
-	}
-
-	/**
-	 * [insert_user_bulk_elasticsearch_lookup This function will insert bulk of user data
-	 * from database to elasticsearch
-	 */
-	public function insert_user_bulk_elasticsearch_lookup($return_response = TRUE)
-	{
-		$result = $this->user_model->insert_user_bulk_elasticsearch();
-
-		$result = json_encode($result);
-
-		$result = str_replace(",{", "\n\r{", $result);
-
-		file_put_contents(JSON_FILE_PATH . '/results.json', $result);
-		$json_data = file_get_contents(JSON_FILE_PATH . "/results.json");
-		$json_data = str_replace(array('[', ']'), '', $json_data);
-		$json_data .= "\n\r";
-
-		unlink(JSON_FILE_PATH . '/results.json');
-
-		$this->elasticsearch->delete_index("users");
-
-		$this->create_user_mapping();
-
-		$response = $this->elasticsearch->insert_bulk("user", 'POST', $json_data);
-
-		if(empty($response['errors'])) {
-			echo json_encode($response);
-		}
-		else {
-			return $response['took'];
 		}
 	}
 
@@ -830,11 +791,20 @@ class User extends PD_Photo
 	public function fetch_users_lookup($per_page, $current_page)
 	{
 		$role_id = isset($_POST['role_id']) && is_numeric($_POST['role_id']);
-		$full_name = isset($_POST['full_name']) && !empty($_POST['full_name']);
 		$role_ac_id = $this->input->post('role_id');
 		$full_name_ac = strtolower($this->input->post('full_name'));
 
-		if($role_id) {
+        if($role_id && !empty($_POST['full_name'])) {
+            $users = $this->user_model->fetch_users(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'role_id' => $role_ac_id,
+                    'full_name' => $full_name_ac
+                )
+            );
+        }
+
+		else if($role_id) {
 			$users = $this->user_model->fetch_users(array(
 				'per_page' => $per_page,
 				'current_page' => $current_page,
@@ -843,20 +813,10 @@ class User extends PD_Photo
 			);
 		}
 
-		if($full_name) {
+		else if(!empty($_POST['full_name'])) {
 			$users = $this->user_model->fetch_users(array(
 				'per_page' => $per_page,
 				'current_page' => $current_page,
-				'full_name' => $full_name_ac
-				)
-			);
-		}
-
-		if($role_id && $full_name) {
-			$users = $this->user_model->fetch_users(array(
-				'per_page' => $per_page,
-				'current_page' => $current_page,
-				'role_id' => $role_ac_id,
 				'full_name' => $full_name_ac
 				)
 			);

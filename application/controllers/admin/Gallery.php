@@ -30,33 +30,35 @@ class Gallery extends PD_Photo {
 	public function product_pictures($product_id)
 	{
 		$config = array();
-        $config["base_url"] = base_url('admin/') . '/'  . $this->router->fetch_class() . '/' . $this->router->fetch_method();
-	    $config["total_rows"] = $this->gallery_model->record_count();
-		$config['per_page'] = 5;
-        $config["uri_segment"] = 4;
-		$config["num_links"] = 1;
-		$config['full_tag_open'] = '<ul class="pagination">';
-		$config['full_tag_close'] = '</ul>';
-		$config['first_tag_open'] = $config['last_tag_open']= $config['next_tag_open']= $config['prev_tag_open'] = $config['num_tag_open'] = '<li>';
-        $config['first_tag_close'] = $config['last_tag_close']= $config['next_tag_close']= $config['prev_tag_close'] = $config['num_tag_close'] = '</li>';
+//        $config["base_url"] = base_url('admin/') . '/'  . $this->router->fetch_class() . '/' . $this->router->fetch_method();
+//	    $config["total_rows"] = $this->gallery_model->record_count();
+//		$config['per_page'] = 5;
+//        $config["uri_segment"] = 4;
+//		$config["num_links"] = 1;
+//		$config['full_tag_open'] = '<ul class="pagination">';
+//		$config['full_tag_close'] = '</ul>';
+//		$config['first_tag_open'] = $config['last_tag_open']= $config['next_tag_open']= $config['prev_tag_open'] = $config['num_tag_open'] = '<li>';
+//        $config['first_tag_close'] = $config['last_tag_close']= $config['next_tag_close']= $config['prev_tag_close'] = $config['num_tag_close'] = '</li>';
         
         // By clicking on performing NEXT pagination.
-		$config['next_link'] = 'Next';
+//		$config['next_link'] = 'Next';
 
 		// By clicking on performing PREVIOUS pagination.
-		$config['prev_link'] = 'Previous';
-        $config['cur_tag_open'] = "<li><span><b>";
-        $config['cur_tag_close'] = "</b></span></li>";
+//		$config['prev_link'] = 'Previous';
+//        $config['cur_tag_open'] = "<li><span><b>";
+//        $config['cur_tag_close'] = "</b></span></li>";
 
-		$this->pagination->initialize($config);
+//		$this->pagination->initialize($config);
 
-        $page = ($this->uri->segment(4)) ? $this->uri->segment(5) : 0;
+//        $page = ($this->uri->segment(4)) ? $this->uri->segment(5) : 0;
 		$this->layouts->set_title('Gallery');
 
-        $data["pictures"] = $this->gallery_model->fetch_pictures($product_id, $config["per_page"], $page);
+//        $data["pictures"] = $this->gallery_model->fetch_pictures($product_id, $config["per_page"], $page);
+        $data["pictures"] = $this->gallery_model->fetch_pictures($product_id);
 
-        $data["links"] = $this->pagination->create_links();
-
+//        $data["links"] = $this->pagination->create_links();
+        $data['product']['id'] = $product_id;
+        $data['tabs'] = $this->load->view('templates/admin/product_nav_tabs', $data, TRUE);
 		$this->layouts->view('templates/admin/gallery', $data);
 	}
 
@@ -119,7 +121,7 @@ class Gallery extends PD_Photo {
 	    	
 	}	
 
-	public function edit_gallery_pics_lookup($id)
+	public function edit_gallery_pics_lookup($product_id, $id)
 	{
 		$this->layouts->set_title('Edit Gallery Picture'); 
 			
@@ -282,7 +284,7 @@ class Gallery extends PD_Photo {
 				$lastpos = strripos($image_name, '_');
 				$cookie_name = substr($image_name, 0, $lastpos);
 				$cookie_name .= '.' . $ext;
-				delete_cookie($cookie_name, 'localhost', '/');
+				delete_cookie($cookie_name, 'local.ims.com', '/');
 			}
 		}
 	}
@@ -322,12 +324,11 @@ class Gallery extends PD_Photo {
 	public function delete_picture_by_id_lookup($id)
 	{
 		$record = $this->gallery_model->get_picture_by_id($id, TRUE);
-
 		$this->delete_picture(GALLERY_IMAGE_PATH, $record);
 
 		$this->gallery_model->delete_picture_by_id($id);
 		$this->session->set_flashdata('delete_message', 'Picture ' . ' ' . ucfirst($this->input->post('title')) .
 							' has been successfully deleted!');
-		redirect('admin/gallery');
+		redirect('admin/gallery/product_pictures/'.$record['product_id']);
 	}	
 }

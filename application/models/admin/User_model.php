@@ -307,6 +307,7 @@
             if ($query->num_rows() > 0)
             {
                 $result = $query->result_array();
+//                echo $this->db->last_query();die;
                 $result = $this->get_attachments($result);
                 return $result;
             }
@@ -322,6 +323,7 @@
         public function user_full_name_autocomplete($full_name)
         {
             $this->db->select('CONCAT(`user`.`first_name`, " ", `user`.`last_name`) AS `full_name`');
+            $this->db->from(`user`);
 
             $this->db->limit(AUTOCOMPLETE_RECORD_LIMIT, 0);
 
@@ -344,7 +346,7 @@
 
             $this->db->order_by('`full_name`', 'desc');
 
-            $query = $this->db->get('user');
+            $query = $this->db->get();
             if ($query->num_rows() > 0)
             {
                 $result = $query->result_array();

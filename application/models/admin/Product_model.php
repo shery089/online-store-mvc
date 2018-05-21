@@ -109,7 +109,6 @@ class Product_model extends CI_Model {
             'profile_image' => $this->profile_image,
 
         );
-
         $this->db->where('id', $product_id);
 
         if ($this->db->update('product', $data))
@@ -119,12 +118,13 @@ class Product_model extends CI_Model {
              * and product_attribute_detail_value id of color value
              */
 
-            $attr_count = $this->get_attr_details_count();
+            $product_attrs_to_delete = array();
 
+            $attr_count = $this->get_attr_details_count();
             $count = 1;
             for($i = 0; $i < $attr_count; $i++)
             {
-                $product_attr = $this->input->post("submitted_product_attr_$count");
+                $product_attrs_to_delete[] = $product_attr = $this->input->post("submitted_product_attr_$count");
                 $product_attr_details = $this->input->post("submitted_product_attr_details_$count");
                 $product_attr_details = explode(',', $product_attr_details);
 
@@ -158,6 +158,14 @@ class Product_model extends CI_Model {
                     }
                 }
                 $count++;
+            }
+
+            if(!empty($product_attrs_to_delete))
+            {
+                $product_attrs_to_delete = implode(', ', $product_attrs_to_delete);
+
+                $this->db->query("DELETE FROM `product_detail` WHERE `product_id` = $product_id
+                AND `product_attribute_detail_id` NOT IN ($product_attrs_to_delete)");
             }
         }
         return TRUE;
@@ -223,7 +231,6 @@ class Product_model extends CI_Model {
             $query = $this->db->get();
 
             $attachments[$i]['product_details']  = $query->result_array();
-
             if($return_data_with_joins || $only_product_attributes) {
                 $attachments[$i] = $this->clean_attachments($attachments[$i], $only_product_attributes);
             }
@@ -289,13 +296,13 @@ class Product_model extends CI_Model {
         return $attachments;
     }
 
-    public function record_count()
+    public function record_count($params=array())
     {
-        if(!isset($params['name']) && !isset($params['category_id'])) {
-            return $this->db->count_all("user");
+        if(!isset($params['name']) && !isset($params['category'])) {
+            return $this->db->count_all("product");
         }
 
-        if(isset($params['name']) || isset($params['category_id'])) {
+        if(isset($params['name']) || isset($params['category'])) {
             $this->db->select('COUNT(id) as total');
         }
 
@@ -317,9 +324,9 @@ class Product_model extends CI_Model {
             $this->db->where("MATCH (`name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
         }
 
-        if(isset($params['category_id'])) {
-            if(!empty($params['category_id'])) {
-                $this->db->where('`category_id`',$params['category_id']);
+        if(isset($params['category'])) {
+            if(!empty($params['category'])) {
+                $this->db->where('`category`',$params['category']);
             }
         }
 
@@ -342,11 +349,9 @@ class Product_model extends CI_Model {
         }
 
         $this->db->limit($params['per_page'], $params['current_page']);
-
         if(isset($params['name'])) {
             $name = strtolower($params['name']);
             $name = preg_replace('!\s+!', ' ', $name);
-
             if(strpos($name, ' ') !== FALSE) {
                 $name = explode(' ', $name);
                 array_walk($name, function(&$value,$key) {
@@ -358,12 +363,14 @@ class Product_model extends CI_Model {
                 $name .= '*';
             }
 
-            $this->db->where("MATCH (`name`) AGAINST ('$name' IN BOOLEAN MODE)");
+            $name = str_replace('* -* ', '-', $name);
+
+            $this->db->where("MATCH (`product`.`name`) AGAINST ('$name' IN BOOLEAN MODE)");
         }
 
-        if(isset($params['category_id'])) {
-            if(!empty($params['category_id'])) {
-                $this->db->where('category_id',$params['category_id']);
+        if(isset($params['category'])) {
+            if(!empty($params['category'])) {
+                $this->db->where('category', $params['category']);
             }
         }
 
@@ -378,7 +385,7 @@ class Product_model extends CI_Model {
         }
 
         $query = $this->db->get();
-
+//        echo $this->db->last_query();
         if ($query->num_rows() > 0) {
             $result = $query->result_array();
             if(!isset($params['has_category_join'])) {
@@ -427,7 +434,7 @@ class Product_model extends CI_Model {
         return $q->result_array()[0];
     }
 
-    public function get_product_by_id($id, $return_data_with_joins=FALSE, $only_category_join=FALSE, $only_product_attributes=FALSE) {
+    public function get_product_by_id($id, $return_data_with_joins=FALSE, $only_category_join=FALSE, $only_product_attributes=FALSE, $return_data_without_joins=FALSE) {
         if($only_category_join) {
             $this->db->select('`product`.`id`, `product`.`name`, `category`.`name` AS `category`, `product`.`profile_image`,
             `product`.`short_description`, `product`.`long_description`');
@@ -446,7 +453,7 @@ class Product_model extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows() > 0) {
             $result = $query->result_array();
-            if($return_data_with_joins || $only_product_attributes) {
+            if($return_data_with_joins || $only_product_attributes || $return_data_without_joins) {
                 $result = $this->get_attachments($result, $return_data_with_joins, $only_product_attributes);
             }
             return $result[0];
@@ -465,4 +472,46 @@ class Product_model extends CI_Model {
         }
         return FALSE;
     }
+
+    /**
+     * Returns products by partially and full matches
+     * @param $full_name
+     * @return mixed Returns users full_name array or an empty array
+     */
+    public function product_full_name_autocomplete($full_name)
+    {
+        $this->db->select('`product`.`name`');
+        $this->db->from('`product`');
+
+        $this->db->limit(AUTOCOMPLETE_RECORD_LIMIT, 0);
+
+        $full_name = preg_replace('!\s+!', ' ', $full_name);
+
+        if(strpos($full_name, ' ') !== FALSE) {
+            $full_name = explode(' ', $full_name);
+            array_walk($full_name, function(&$value,$key) {
+                $value="$value*";
+            });
+            $full_name = implode(' ', $full_name);
+        }
+        else {
+            $full_name .= '*';
+        }
+
+        if(isset($full_name)) {
+            $this->db->where("MATCH (`name`) AGAINST ('$full_name' IN BOOLEAN MODE)");
+        }
+
+        $this->db->order_by('`name`', 'desc');
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0)
+        {
+            $result = $query->result_array();
+            return $result;
+        }
+
+        return array();
+    }
+
 }

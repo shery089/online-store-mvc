@@ -434,7 +434,7 @@ class Product_description extends PD_Photo {
 		if ($this->product_description_model->delete_product($id)) 
 		{
 			$this->session->set_flashdata('delete_message', 'Record has been successfully deleted!');
-		    redirect('/admin/Product Description/');
+		    redirect('/admin/product/');
 		}
 	}
 }

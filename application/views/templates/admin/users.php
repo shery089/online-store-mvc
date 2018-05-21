@@ -103,7 +103,7 @@
 						<tr>
 				   			<td><?= ucwords($user['full_name']); ?></td>
 				   			<td><?= ucwords($user['user_name']); ?></td>
-				   			<td><?= ucwords($user['email']); ?></td>
+				   			<td><?= $user['email']; ?></td>
 				   			<td><?= ucwords($user['mobile_number']); ?></td>
 				   			<td><?= ucwords($user['role']); ?></td>
 				   			<td>

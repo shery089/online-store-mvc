@@ -3,7 +3,7 @@
         <div class="col-lg-8">
 
             <!-- Form -->
-            <?= form_open_multipart('admin/gallery/edit_gallery_pics_lookup/'. $gallery['id'], 'class=form id=edit_gallery_form novalidate'); ?>
+            <?= form_open_multipart('admin/gallery/edit_gallery_pics_lookup/'. $gallery['product_id'] . '/' . $gallery['id'], 'class=form id=edit_gallery_form novalidate'); ?>
             <h1 class="page-header text-center"><?= $layout_title ?></h1>
             
             <!-- Title -->

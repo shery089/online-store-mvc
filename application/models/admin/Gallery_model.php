@@ -327,11 +327,11 @@ class Gallery_model extends CI_Model {
     {
         if($edit)
         {
-            $this->db->select('`gallery`.`id`, `gallery`.`title`, `gallery`.`image, `gallery`.`thumbnail, `gallery`.`profile_image`');
+            $this->db->select('`gallery`.`product_id`, `gallery`.`id`, `gallery`.`title`, `gallery`.`image, `gallery`.`thumbnail, `gallery`.`profile_image`');
         }
         else
         {
-            $this->db->select('`gallery`.`id`, `gallery`.`title`, `gallery`.`thumbnail`, `gallery`.`uploaded_date`,
+            $this->db->select('`gallery`.`product_id`, `gallery`.`id`, `gallery`.`title`, `gallery`.`thumbnail`, `gallery`.`uploaded_date`,
                                 `gallery`.`updated_date`, CONCAT(`user`.`first_name`, " ", `user`.`middle_name`, 
                                 " ", `user`.`last_name`) AS `full_name`');
         
@@ -345,7 +345,6 @@ class Gallery_model extends CI_Model {
         $q = $this->db->get(); 
 
         $result = $q->result_array();
-    
         return $result[0];
     }
 
@@ -407,14 +406,15 @@ class Gallery_model extends CI_Model {
         return $this->db->count_all("gallery_description");
     }
 
-    public function fetch_pictures($product_id, $limit, $start)
+//    public function fetch_pictures($product_id, $limit, $start)
+    public function fetch_pictures($product_id)
     {
-        $this->db->select('`gallery`.`id`, `gallery`.`title`, CONCAT(`user`.`first_name`, " ", `user`.`middle_name`, " ", `user`.`last_name`) 
+        $this->db->select('`gallery`.`product_id`, `gallery`.`id`, `gallery`.`title`, CONCAT(`user`.`first_name`, " ", `user`.`middle_name`, " ", `user`.`last_name`) 
                             AS `full_name`, `gallery`.`thumbnail`, DATE(`gallery`.`uploaded_date`) AS uploaded_date, `gallery`.`status`');
         
         $this->db->join('user', 'user.id = gallery.posted_by', 'left');
         
-        $this->db->limit($limit, $start);
+//        $this->db->limit($limit, $start);
 
         $this->db->from('gallery');
 
@@ -424,9 +424,7 @@ class Gallery_model extends CI_Model {
 
         $query = $this->db->get();
 
-        echo $this->db->last_query();die;
-
-        if ($query->num_rows() > 0) 
+        if ($query->num_rows() > 0)
         {
             $result = $query->result_array();
             return $result;

@@ -116,7 +116,7 @@ $(function() {
      */
     $('#edit_gallery_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_gallery_form', '/admin/gallery');
+        createOrUpdateByAjax('edit_gallery_form', '/admin/gallery/product_pictures/' + path_parts[path_parts.length-2]);
     });
 
 
@@ -743,17 +743,10 @@ $(function() {
         var id = $(this).attr('id');
         id = id.split('_');
         action = id[0];
-        entity = id[2] == 'political' ? id[2] + '_' + id[3] : id[2];
+        entity = id[2];
         id = id[1];
-
-        if(path_parts[2] == 'post')
-        {
-            getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action + '_' + entity);
-        }
-        else
-        {
-            getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
-        }
+        var index = path_parts.indexOf('admin') + 1;
+        getModal(base_url + '/admin/' + path_parts[index] + '/get_modal/' + id, action)
     });
 
 
@@ -767,28 +760,37 @@ $(function() {
         action = id[0];
         entity = id[2];
         id = id[1];
-
-        getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
+        var index = path_parts.indexOf('admin') + 1;
+        getModal(base_url + '/admin/' + path_parts[index] + '/get_modal/' + id, action)
     });
 
-    if(path_parts[4] == 'add_gallery_pics_lookup')
-    {
+    if($.inArray('add_gallery_pics_lookup', path_parts) !== -1) {
         Dropzone.autoDiscover = false;
-        $("#add_gallery_form").dropzone({
-            url: base_url + "/admin/gallery/add_gallery_pics_lookup/" + path_parts[5],
-            maxFileSize: 50,
-            maxFiles: 50,
-            addRemoveLinks: true,
-            acceptedFiles: "image/jpeg,image/png",
-            init: function() {
-                this.on("queuecomplete", function() {
-                    $('.page-header').before('<p class="alert alert-success alert-dismissable fade in text-center top-height">' +
-                        'Please wait for images to be uploaded!' + '<button type="button" class="close" data-dismiss="alert"' +
-                        'aria-hidden="true">×</button>' + '</p>');
-                    setTimeout(function(){ submitImagesNames(); }, 3000);
-                });
-            }
-        });
+        var index = path_parts[path_parts.length-1];
+        if($.isNumeric(index)) {
+
+            var add_gallery_form = $("#add_gallery_form");
+            add_gallery_form.css({
+                'text-align': 'center',
+                'padding': '60px',
+                'margin-bottom': '25px'
+            });
+            add_gallery_form.dropzone({
+                url: base_url + "/admin/gallery/add_gallery_pics_lookup/" + index,
+                maxFileSize: 50,
+                maxFiles: 50,
+                addRemoveLinks: true,
+                acceptedFiles: "image/jpeg,image/png",
+                init: function() {
+                    this.on("queuecomplete", function() {
+                        $('.page-header').before('<p class="alert alert-success alert-dismissable fade in text-center top-height">' +
+                            'Please wait for images to be uploaded!' + '<button type="button" class="close" data-dismiss="alert"' +
+                            'aria-hidden="true">×</button>' + '</p>');
+                        setTimeout(function(){ submitImagesNames(); }, 3000);
+                    });
+                }
+            });
+        }
     }
 
 
@@ -804,7 +806,8 @@ $(function() {
             method: 'post',
             success: function(data)
             {
-                window.location.href = base_url + '/admin/gallery/product_pictures/' + path_parts[5];
+                var index = path_parts[path_parts.length-1];
+                window.location.href = base_url + '/admin/gallery/product_pictures/' + index;
             },
             error: function()
             {
@@ -823,14 +826,10 @@ $(function() {
         var id = $(this).attr('id');
         id = id.split('_');
         action = id[0];
-        entity = id[2] == 'political' ? id[2] + '_' + id[3] : id[2];
+        entity = id[2];
         id = id[1];
-        /*
-         if(path_parts[2] == 'post')
-         {
-         getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action + '_' + entity);
-         }*/
-        getModal(base_url + '/admin/' + path_parts[2] + '/get_modal/' + id, action)
+        var index = path_parts.indexOf('admin') + 1;
+        getModal(base_url + '/admin/' + path_parts[index] + '/get_modal/' + id, action)
     });
 
     /**
@@ -841,9 +840,9 @@ $(function() {
         var id = $(this).attr('id');
         id = id.split('_');
         var action = id[1];
-        var entity = id[2] == 'political' ? id[2] + '_' + id[3] : id[2];
-        var featured = id[2] == 'political' ? id[4] : id[3];
-        var entity_id = id[2] == 'political' ? id[5] : id[4];
+        var entity = id[2];
+        var featured = id[3];
+        var entity_id = id[4];
         id = id[1];
         var details = action + '_' + entity + '_' + featured + '_' + entity_id;
         if(path_parts[2] == 'post')
@@ -873,6 +872,10 @@ $(function() {
         }
     });
 
+    $(document).on('click', '#user_search_btn', function(e) {
+        userSearch();
+    });
+
     $(document).on('keypress', '#search_by_product_name', function(e) {
         if(e.which == 13) {
             productSearch();
@@ -898,7 +901,8 @@ $(function() {
 
     $(document).on('change', '[id^="product_attribute_"]', function() {
 
-        if(path_parts[2] == 'product_attribute') {
+
+        if($.inArray('product_attribute', path_parts) !== -1) {
 
             if($('#product_attribute option:selected').text().toLowerCase()  == 'color') {
 
@@ -1021,7 +1025,7 @@ $(function() {
         return length - 1; // to ignore Choose one or more option in the count
     }
 
-    if(path_parts[2] == 'product_attribute_detail')
+    if($.inArray('product_attribute_detail', path_parts) !== -1)
     {
         $(".pick-a-color").pickAColor({
             showSpectrum            : true,
@@ -1098,7 +1102,7 @@ $(function() {
      =            searchUser comment block           =
      =============================================*/
 
-    function searchUser(id)
+  /*  function searchUser(id)
     {
         var data = {'role_id': id};
         // calling ajax
@@ -1117,7 +1121,7 @@ $(function() {
                 alert('Something went wrong!');
             }
         });
-    }
+    }*/
 
     /*=====  End of getModal comment block  ======*/
 
@@ -1477,6 +1481,10 @@ $(function() {
 
     if($.inArray('add_gallery_pics_lookup', path_parts) !== -1) {
         $(".nav-pills li a:contains('Add New Product Images')").parent().addClass('active');
+    }
+
+    if($.inArray('product_pictures', path_parts) !== -1) {
+        $(".nav-pills li a:contains('Edit Product Gallery Images')").parent().addClass('active');
     }
 
     if($.inArray('edit_product_lookup', path_parts) !== -1) {
