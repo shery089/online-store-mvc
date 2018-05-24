@@ -17,6 +17,9 @@
                         <li>
                             <a href="<?= site_url('admin/category'); ?>"><i class="fa fa-table fa-fw"></i> Category</a>
                         </li>
+                        <li>
+                            <a href="<?= site_url('admin/company'); ?>"><i class="fa fa-building fa-fw"></i> Company</a>
+                        </li>
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>

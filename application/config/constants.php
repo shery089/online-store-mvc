@@ -89,33 +89,10 @@ define('PRODUCT_IMAGE', ADMIN_IMAGES_PATH  . 'products/');
 define('GALLERY_IMAGE_PATH', realpath(FCPATH  . 'assets/admin/images/gallery/'));
 define('GALLERY_IMAGE', ADMIN_IMAGES_PATH  . 'gallery/');
 
-/*
-|--------------------------------------------------------------------------
-| Locate parties images 
-|--------------------------------------------------------------------------
-|
-| This will locate all the politicians images
-| 
-*/
-
-define('PARTY_IMAGE_PATH', realpath(FCPATH  . 'assets/admin/images/political_parties/'));
-define('PARTY_IMAGE', ADMIN_IMAGES_PATH  . 'political_parties/');
 
 /*
 |--------------------------------------------------------------------------
-| Locate newspaper images 
-|--------------------------------------------------------------------------
-|
-| This will locate all the user images
-| 
-*/
-
-define('NEWSPAPER_IMAGE_PATH', realpath(FCPATH  . 'assets/admin/images/newspapers/'));
-define('NEWSPAPER_IMAGE', ADMIN_IMAGES_PATH  . 'newspapers/');
-
-/*
-|--------------------------------------------------------------------------
-| Locate newspaper images 
+| Locate Category images
 |--------------------------------------------------------------------------
 |
 | This will locate all the user images
@@ -124,6 +101,18 @@ define('NEWSPAPER_IMAGE', ADMIN_IMAGES_PATH  . 'newspapers/');
 
 define('CATEGORY_IMAGE_PATH', realpath(FCPATH  . 'assets/admin/images/categories/'));
 define('CATEGORY_IMAGE', ADMIN_IMAGES_PATH  . 'categories/');
+
+/*
+|--------------------------------------------------------------------------
+| Locate Company images
+|--------------------------------------------------------------------------
+|
+| This will locate all the user images
+|
+*/
+
+define('COMPANY_IMAGE_PATH', realpath(FCPATH  . 'assets/admin/images/companies/'));
+define('COMPANY_IMAGE', ADMIN_IMAGES_PATH  . 'companies/');
 
 /*
 |--------------------------------------------------------------------------

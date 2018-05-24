@@ -86,7 +86,6 @@
 
             if ($this->db->insert('user', $data))
             {
-                $id = $this->db->insert_id();
                 return TRUE;
             }
         }

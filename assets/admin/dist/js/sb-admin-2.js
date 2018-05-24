@@ -121,25 +121,25 @@ $(function() {
 
 
     /**
-     * [description: Triggers when '#add_user_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#add_company_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
-    $('#add_newspaper_form').on('submit', function(e){
+    $('#add_company_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('add_newspaper_form', '/admin/newspaper/');
+        createOrUpdateByAjax('add_company_form', '/admin/company/');
     });
 
     /**
-     * [description: Triggers when '#edit_role_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#edit_company_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
-    $('#edit_newspaper_form').on('submit', function(e){
+    $('#edit_company_form').on('submit', function(e){
         e.preventDefault();
-        createOrUpdateByAjax('edit_newspaper_form', '/admin/newspaper/');
+        createOrUpdateByAjax('edit_company_form', '/admin/company/');
     });
 
     /**
-     * [description: Triggers when '#add_user_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#add_role_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#add_role_form').on('submit', function(e){
@@ -157,7 +157,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_user_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#change_password_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#change_password_form').on('submit', function(e){
@@ -190,43 +190,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_designation_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_designation_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('add_designation_form', '/admin/designation/');
-    });
-
-    /**
-     * [description: Triggers when '#add_designation_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_designation_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('edit_designation_form', '/admin/designation/');
-    });
-
-    /**
-     * [description: Triggers when '#add_political_party_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_political_party_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('add_political_party_form', '/admin/political_party/');
-    });
-
-    /**
-     * [description: Triggers when '#edit_political_party_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_political_party_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('edit_political_party_form', '/admin/political_party/');
-    });
-
-    /**
-     * [description: Triggers when '#add_politician_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#add_category_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#add_category_form').on('submit', function(e){
@@ -235,7 +199,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_politician_form' is submitted. Prevents normal form submission
+     * [description: Triggers when '#edit_category_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#edit_category_form').on('submit', function(e){
@@ -244,7 +208,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_product_attribute' is submitted. Prevents normal form submission
+     * [description: Triggers when '#add_product_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
 
@@ -277,7 +241,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#edit_product_attribute' is submitted. Prevents normal form submission
+     * [description: Triggers when '#edit_product_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#edit_product_form').on('submit', function(e){
@@ -309,7 +273,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_product_description' is submitted. Prevents normal form submission
+     * [description: Triggers when '#edit_product_desc_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#edit_product_desc_form').on('submit', function(e){
@@ -318,7 +282,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#add_product_attribute' is submitted. Prevents normal form submission
+     * [description: Triggers when '#add_product_attribute_detail_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#add_product_attribute_detail_form').on('submit', function(e){
@@ -344,7 +308,7 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#edit_product_attribute' is submitted. Prevents normal form submission
+     * [description: Triggers when '#edit_product_attribute_detail_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
     $('#edit_product_attribute_detail_form').on('submit', function(e){
@@ -370,236 +334,6 @@ $(function() {
     });
 
     /**
-     * [description: Triggers when '#edit_halqa_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_columnist_form').on('submit', function(e){
-
-        /*=======================================================
-         = form_multiselect newspaper comment block                  =
-         ========================================================*/
-
-        var newspapers = $("#newspaper").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_newspaper',
-            name: 'submitted_newspaper',
-            value: newspapers
-        }).appendTo('#edit_columnist_form');
-
-        /*=====  End of form_multiselect newspaper comment block  ======*/
-
-        /*=======================================================
-         = form_multiselect newspaper comment block                  =
-         ========================================================*/
-
-        var newspapers = $("#newspaper").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_newspaper',
-            name: 'submitted_newspaper',
-            value: newspapers
-        }).appendTo('#add_columnist_form');
-
-        /*=====  End of form_multiselect newspaper comment block  ======*/
-
-        e.preventDefault();
-        createOrUpdateByAjax('edit_columnist_form', '/admin/columnist/');
-    });
-
-
-    /**
-     * [description: Triggers when '#add_politician_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_politician_form').on('submit', function(e){
-
-        /*=======================================================
-         = form_multiselect product_atrributes comment block            =
-         ========================================================*/
-
-        var product_atrributess = $("#product_atrributes").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_product_atrributes',
-            name: 'submitted_product_atrributes',
-            value: product_atrributess
-        }).appendTo('#add_politician_form');
-
-        /*=====  End of form_multiselect product_atrributes comment block  ======*/
-
-        /*=======================================================
-         = form_multiselect halqa comment block                  =
-         ========================================================*/
-
-        var designations = $("#halqa").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_halqa',
-            name: 'submitted_halqa',
-            value: designations
-        }).appendTo('#add_politician_form');
-
-        /*=====  End of form_multiselect halqa comment block  ======*/
-
-        e.preventDefault();
-        createOrUpdateByAjax('add_politician_form', '/admin/politician/');
-    });
-
-    /**
-     * [description: Triggers when '#add_post_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_column_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('add_column_form', '/admin/column/');
-    });
-
-    /**
-     * [description: Triggers when '#add_post_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_column_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('edit_column_form', '/admin/post/');
-    });
-
-    /**
-     * [description: Triggers when '#add_post_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_post_form').on('submit', function(e){
-        /*=======================================================
-         = form_multiselect type comment block            =
-         ========================================================*/
-
-        var politicians = $("#politician").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_politician',
-            name: 'submitted_politician',
-            value: politicians
-        }).appendTo('#add_post_form');
-
-        var political_parties = $("#political_party").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_political_party',
-            name: 'submitted_political_party',
-            value: political_parties
-        }).appendTo('#add_post_form');
-
-        /*=====  End of form_multiselect type comment block  ======*/
-
-        e.preventDefault();
-        createOrUpdateByAjax('add_post_form', '/admin/post/');
-    });
-
-    /**
-     * [description: Triggers when '#add_post_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_post_form').on('submit', function(e){
-        /*=======================================================
-         = form_multiselect type comment block            =
-         ========================================================*/
-
-        var politicians = $("#politician").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_politician',
-            name: 'submitted_politician',
-            value: politicians
-        }).appendTo('#edit_post_form');
-
-        var political_parties = $("#political_party").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_political_party',
-            name: 'submitted_political_party',
-            value: political_parties
-        }).appendTo('#edit_post_form');
-
-        /*=====  End of form_multiselect type comment block  ======*/
-
-        e.preventDefault();
-        createOrUpdateByAjax('edit_post_form', '/admin/post/');
-    });
-
-    /**
-     * [description: Triggers when '#edit_politician_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_politician_form').on('submit', function(e){
-        /*=======================================================
-         = form_multiselect designation comment block            =
-         ========================================================*/
-
-        var designations = $("#designation").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_designation',
-            name: 'submitted_designation',
-            value: designations
-        }).appendTo('#edit_politician_form');
-
-        /*=====  End of form_multiselect designation comment block  ======*/
-
-        /*=======================================================
-         = form_multiselect halqa comment block                  =
-         ========================================================*/
-
-        var designations = $("#halqa").val();
-        $('<input>').attr({
-            type: 'hidden',
-            id: 'submitted_halqa',
-            name: 'submitted_halqa',
-            value: designations
-        }).appendTo('#edit_politician_form');
-
-        /*=====  End of form_multiselect designation comment block  ======*/
-
-        e.preventDefault();
-        createOrUpdateByAjax('edit_politician_form', '/admin/politician/');
-    });
-
-    /**
-     * [description: Triggers when '#add_political_party_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_halqa_type_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('add_halqa_type_form', '/admin/halqa_type/');
-    });
-
-    /**
-     * [description: Triggers when '#edit_halqa_type_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_halqa_type_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('edit_halqa_type_form', '/admin/halqa_type/');
-    });
-
-    /**
-     * [description: Triggers when '#add_halqa_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#add_halqa_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('add_halqa_form', '/admin/halqa/');
-    });
-
-    /**
-     * [description: Triggers when '#edit_halqa_form' is submitted. Prevents normal form submission
-     * and calls createOrUpdateByAjax(); for ajax form submission]
-     */
-    $('#edit_halqa_form').on('submit', function(e){
-        e.preventDefault();
-        createOrUpdateByAjax('edit_halqa_form', '/admin/halqa/');
-    });
-
-    /**
      * [description: Triggers when '#login_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
@@ -610,7 +344,7 @@ $(function() {
 
     /*=====  End of Submit Handler comment block  ======*/
 
-    var $sfield = $('#search_by_user_full_name, #search_by_product_name').autocomplete({
+    var $sfield = $('#search_by_user_full_name, #search_by_product_name, #search_by_company_name').autocomplete({
         select: function( event, ui )
         {
             if(ui.item.value === 'No Results Found')
@@ -661,6 +395,19 @@ $(function() {
                     response($.map(product_name, function(product) {
                         return {
                             value: product
+                        };
+                    }).slice(0, 5));
+
+                }, "json");
+            }
+            else if($.inArray('company', path_parts) !== -1) {
+
+                url = base_url + "/admin/company/company_name_autocomplete/";
+
+                $.post(url, {company_name:request.term}, function(company_name){
+                    response($.map(company_name, function(company) {
+                        return {
+                            value: company
                         };
                     }).slice(0, 5));
 
@@ -876,6 +623,16 @@ $(function() {
         userSearch();
     });
 
+    $(document).on('keypress', '#search_by_company_name, #search_by_company_email', function(e) {
+        if(e.which == 13) {
+            companySearch();
+        }
+    });
+
+    $(document).on('click', '#company_search_btn', function(e) {
+        companySearch();
+    });
+
     $(document).on('keypress', '#search_by_product_name', function(e) {
         if(e.which == 13) {
             productSearch();
@@ -887,6 +644,14 @@ $(function() {
         var full_name = $.trim($('#search_by_user_full_name').val());
         if(role_id.length > 0 || full_name.length > 0) {
             searchUser(role_id, full_name);
+        }
+    }
+
+    function companySearch() {
+        var company_name = $('#search_by_company_name').val();
+        var company_email = $.trim($('#search_by_company_email').val());
+        if(company_name.length > 0 || company_email.length > 0) {
+            searchCompany(company_name, company_email);
         }
     }
 
@@ -1160,6 +925,42 @@ $(function() {
     }
 
     /*=====  End of searchUser comment block  ======*/
+
+
+    /*=============================================
+     =            searchCompany comment block     =
+     =============================================*/
+
+    function searchCompany(company_name, company_email)
+    {
+        var data = {'company_name': company_name, 'company_email': company_email};
+
+        var elemets_to_disable = $('#search_by_company_name, #search_by_company_email, #company_search_btn');
+
+        // calling ajax
+        $.ajax({
+            url: base_url + '/admin/company/search_company_lookup/',
+            method: 'post',
+            data: data,
+            beforeSend: function() {
+                $('#searched_results').empty();
+                elemets_to_disable.attr('disabled', true);
+                loading.show();
+            },
+            success: function(data)
+            {
+                loading.hide();
+                elemets_to_disable.removeAttr('disabled');
+                $('#searched_results').append(data);
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of searchCompany comment block  ======*/
 
 
     /*=============================================

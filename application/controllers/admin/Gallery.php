@@ -284,7 +284,7 @@ class Gallery extends PD_Photo {
 				$lastpos = strripos($image_name, '_');
 				$cookie_name = substr($image_name, 0, $lastpos);
 				$cookie_name .= '.' . $ext;
-				delete_cookie($cookie_name, 'local.ims.com', '/');
+				delete_cookie($cookie_name, DOMAIN, '/');
 			}
 		}
 	}
