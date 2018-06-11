@@ -4,10 +4,14 @@
  * Dev Server configuration file
  */
 
+// Default Timezone
+date_default_timezone_set("Asia/Karachi");
+
 define('BASE_URL',                        'http://testing.esmactech.com/');
 define('USERS_PER_PAGE',                  6);
 define('PRODUCTS_PER_PAGE',               6);
-define('COMPANIES_PER_PAGE',              2);
+define('COMPANIES_PER_PAGE',              6);
+define('PURCHASE_ORDERS_PER_PAGE',        6);
 define('URI_SEGMENT',                     4);
 define('AUTOCOMPLETE_RECORD_LIMIT',       6);
 

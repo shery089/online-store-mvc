@@ -681,3 +681,15 @@ table.dataTable thead .sorting:after {
 .admin-table {
     margin-bottom: 0;
 }
+
+.mar-top-27 {
+    margin-top: 27px;
+}
+
+.mar-bot-10 {
+    margin-bottom: 10px;
+}
+
+.mar-rgt-25 {
+    margin-right: 25px;
+}

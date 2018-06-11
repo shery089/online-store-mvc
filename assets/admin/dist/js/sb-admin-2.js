@@ -208,6 +208,26 @@ $(function() {
     });
 
     /**
+     * [description: Triggers when '#add_purchase_order_form' is submitted. Prevents normal form submission
+     * and calls createOrUpdateByAjax(); for ajax form submission]
+     */
+
+    $('#add_purchase_order_form').on('submit', function(e){
+        e.preventDefault();
+        createOrUpdateByAjax('add_purchase_order_form', '/admin/purchase_order/');
+    });
+
+    /**
+     * [description: Triggers when '#edit_purchase_order_form' is submitted. Prevents normal form submission
+     * and calls createOrUpdateByAjax(); for ajax form submission]
+     */
+
+    $('#edit_purchase_order_form').on('submit', function(e){
+        e.preventDefault();
+        createOrUpdateByAjax('edit_purchase_order_form', '/admin/purchase_order/');
+    });
+
+    /**
      * [description: Triggers when '#add_product_form' is submitted. Prevents normal form submission
      * and calls createOrUpdateByAjax(); for ajax form submission]
      */
@@ -609,6 +629,25 @@ $(function() {
         productSearch();
     });
 
+    $(document).on('change', '#search_by_product_company', function() {
+        if($.inArray('purchase_order', path_parts) !== -1) {
+            purchaseOrderSearch();
+            getProductsByCompanyId();
+        }
+        else {
+            productSearch();
+        }
+    });
+
+    $(document).on('change', '#search_by_product_id', function() {
+        if($.inArray('purchase_order', path_parts) !== -1) {
+            purchaseOrderSearch();
+        }
+        else {
+            productSearch();
+        }
+    });
+
     $(document).on('click', '#product_search_btn', function() {
         productSearch();
     });
@@ -655,20 +694,41 @@ $(function() {
         }
     }
 
-    function productSearch() {
-        var product_category = $.trim($('#search_by_product_category').val());
-        var product_name = $.trim($('#search_by_product_name').val());
+    function purchaseOrderSearch() {
+        var product_company = $.trim($('#search_by_product_company').val());
+        var product_id = $.trim($('#search_by_product_id').val());
 
-        if(product_category.length > 0 || product_name.length > 0) {
-            searchProduct(product_category, product_name);
+        if(product_company.length > 0 || product_id.length > 0) {
+            searchPurchaseOrder(product_id, product_company);
         }
     }
 
+    function productSearch() {
+        var product_category = $.trim($('#search_by_product_category').val());
+        var product_company = $.trim($('#search_by_product_company').val());
+        var product_name = $.trim($('#search_by_product_name').val());
+
+        if(product_category.length > 0 || product_name.length > 0 || product_company.length > 0) {
+            searchProduct(product_category, product_name, product_company);
+        }
+    }
+
+    $(document).on('change', '[id^="product_"]', function() {
+        if($.inArray('purchase_order', path_parts) !== -1) {
+            $('[id^="product_attribute_"]').removeAttr('disabled');
+            $('.selectpicker').selectpicker('refresh');
+            var _this = $(this);
+            var product_id = _this.val();
+            var attr_id = _this.attr('id').split('_');
+            if($.isNumeric(attr_id[1])) {
+                var attr_id = _this.attr('id').split('_').pop();
+                getProductSpecificAttributes(product_id, attr_id);
+            }
+        }
+    });
+
     $(document).on('change', '[id^="product_attribute_"]', function() {
-
-
         if($.inArray('product_attribute', path_parts) !== -1) {
-
             if($('#product_attribute option:selected').text().toLowerCase()  == 'color') {
 
                 $('#product_attribute_detail').removeAttr('name');
@@ -702,18 +762,25 @@ $(function() {
             }
         }
         else {
+            $('[id^="product_attr_details_"]').removeAttr('disabled');
+            $('.selectpicker').selectpicker('refresh');
             var _this = $(this);
             var id = _this.attr('id');
             var selected_text = $( '#' + id + ' option:selected').text().toLowerCase();
             var product_attribute_id = _this.val();
             id = id.split('_');
             id = id.pop();
-            getProductDetailOptions(id, product_attribute_id, selected_text);
+            if($.inArray('purchase_order', path_parts) !== -1) {
+                product_id = $('#product_' + id).val();
+                getProductDetailOptionsForPurchase(id, product_attribute_id, selected_text, '', product_id);
+            }
+            else {
+                getProductDetailOptions(id, product_attribute_id, selected_text);
+            }
         }
     });
 
     $('#add_new_product_attribute_section').on('click', function(){
-
         var last_inserted_id = getLastInsertedId();
 
         var prod_attr_total = getProductAttributeChildrenCount(last_inserted_id);
@@ -733,6 +800,23 @@ $(function() {
             $('#delete_new_product_attribute_section').removeClass('hide');
         }
 
+    });
+
+    $('#add_new_purchase_order_section').on('click', function(){
+        var last_inserted_id = getLastInsertedId();
+
+        var prod_attr_total = getProductAttributeChildrenCount(last_inserted_id);
+
+        last_inserted_id = parseInt(last_inserted_id) + 1; // +1 to have a unique id
+
+        addNewPurchaseOrderSection(last_inserted_id);
+
+        if($('[id^="sale_price_"]').length > 1) {
+            $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('style');
+        }
+        else {
+
+        }
     });
 
     $('#delete_new_product_attribute_section').on('click', function(){
@@ -761,6 +845,27 @@ $(function() {
 
     });
 
+    $(document).on('click', '[id^="delete_new_purchase_order_section_"]', function(){
+
+        $('#loader').show();
+        var _this = $(this);
+        var id = _this.data('id');
+        $('#purchase_record_' + id).fadeOut('slow', function () {
+            $('#add_new_product_attribute_section').attr('disabled', true);
+            $('[id^="delete_new_purchase_order_section_"]').attr('disabled', true);
+            $(this).remove();
+        });
+
+        if($('[id^="sale_price_"]').length > 1) {
+            $('[id^="delete_new_purchase_order_section_"]').hide();
+        }
+
+        $('#add_new_product_attribute_section').removeAttr('disabled');
+        $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('disabled');
+        $('#loader').hide();
+
+    });
+
     /**
      * This function returns last inserted id of Product Attribute or Product Attribute Details
      * and total number of records in the Product Attribute Drop Down
@@ -770,13 +875,13 @@ $(function() {
     function getLastInsertedId() {
 
         var prod_attr_dtl_elem_len =  $('[id^="product_attr_details_"]').length;
+        var last_inserted_id_arr = $('[id^="product_attr_details_"]').eq(prod_attr_dtl_elem_len - 1).attr('id'); // to get the last inserted id
 
-        var last_inserted_id = $('[id^="product_attr_details_"]').eq(prod_attr_dtl_elem_len - 1).attr('id'); // to get the last inserted id
-
-        last_inserted_id = last_inserted_id.split('_');
-
-        last_inserted_id = last_inserted_id.pop();
-
+        last_inserted_id_arr = last_inserted_id_arr.split('_');
+        last_inserted_id = last_inserted_id_arr.pop();
+        if(!$.isNumeric(last_inserted_id)) {
+            last_inserted_id = last_inserted_id_arr[last_inserted_id_arr.length-1];
+        }
         return last_inserted_id;
     }
 
@@ -788,6 +893,15 @@ $(function() {
     function getProductAttributeChildrenCount(id) {
         var length = $('#product_attribute_' + id).children('option').length;
         return length - 1; // to ignore Choose one or more option in the count
+    }
+
+    if($.inArray('edit_purchase_order_lookup', path_parts) !== -1)
+    {
+        var product_attribute_value_elem = $('#product_attribute_value');
+        var product_attribute_value = product_attribute_value_elem.val();
+        if(product_attribute_value.indexOf('#') !== -1) {
+            product_attribute_value_elem.css('background', product_attribute_value);
+        }
     }
 
     if($.inArray('product_attribute_detail', path_parts) !== -1)
@@ -804,6 +918,69 @@ $(function() {
             inlineDropdown          : true
         });
     }
+/*
+    if($.inArray('purchase_order', path_parts) !== -1)
+    {
+        $('[id^="product_attribute_"]').attr('disabled', true);
+        $('[id^="product_attr_details_"]').attr('disabled', true);
+        $('.selectpicker').selectpicker('refresh');
+    }*/
+
+    /*=============================================
+     =     getProductSpecificAttributes block     =
+     =============================================*/
+
+    function getProductSpecificAttributes(product_id, attr_id)
+    {
+        var data = {'product_id': product_id};
+        // calling ajax
+        $.ajax({
+            url: base_url + '/admin/product/get_product_specific_attributes',
+            method: 'post',
+            data: data,
+            success: function(data)
+            {
+                $('#product_attribute_' + attr_id).html(data);
+                $('.selectpicker').selectpicker('refresh');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of getProductSpecificAttributes block  ======*/
+
+
+    /*=============================================
+     =     getProductsByCompanyId block     =
+     =============================================*/
+
+    function getProductsByCompanyId()
+    {
+        var search_by_product_id_elem = $('#search_by_product_id');
+        search_by_product_id_elem.attr('disabled', true);
+        var data = {'product_company': $('#search_by_product_company').val()};
+        // calling ajax
+        $.ajax({
+            url: base_url + '/admin/product/get_products_by_company_id',
+            method: 'post',
+            data: data,
+            success: function(data)
+            {
+                search_by_product_id_elem.html(data);
+                search_by_product_id_elem.removeAttr('disabled');
+                $('.selectpicker').selectpicker('refresh');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of getProductSpecificAttributes block  ======*/
 
     /*=============================================
      =              setPostFeature block           =
@@ -964,16 +1141,40 @@ $(function() {
 
 
     /*=============================================
-     =            productUser comment block           =
+     =      searchProduct comment block           =
      =============================================*/
-
-    function searchProduct(product_category, product_name)
+    function searchProduct(product_category, product_name, product_company)
     {
-        var data = {'product_category': product_category, 'product_name': product_name};
+        var data = {'product_category': product_category, 'product_name': product_name, 'product_company': product_company};
         // calling ajax
 
         $.ajax({
             url: base_url + '/admin/product/search_product_lookup/',
+            method: 'post',
+            data: data,
+            success: function(data)
+            {
+                $('#searched_results').empty();
+                $('#searched_results').append(data);
+                //$("#modal").modal({backdrop: "static", toggle: true});
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=============================================
+     =      searchPurchaseOrder comment block     =
+     =============================================*/
+    function searchPurchaseOrder(product_id, product_company)
+    {
+        var data = {'product_id': product_id, 'product_company': product_company};
+        // calling ajax
+
+        $.ajax({
+            url: base_url + '/admin/purchase_order/search_purchase_order_lookup/',
             method: 'post',
             data: data,
             success: function(data)
@@ -1051,7 +1252,67 @@ $(function() {
     /*=====  End of addNewProductAttributeSection comment block  ======*/
 
 
+    /*=============================================
+     =            addNewProductAttributeSection comment block           =
+     =============================================*/
+
+    function addNewPurchaseOrderSection(id_prepend)
+    {
+        var options_arr = getSelectedPurchaseOrderAttributes();
+
+        var url = base_url + '/admin/purchase_order/add_new_purchase_order_section';
+
+        var data = {'id_prepend': id_prepend, 'options_arr': options_arr};
+        // calling ajax
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            beforeSend:function()
+            {
+                $('#loader').show();
+                $('#add_new_purchase_order_section').attr('disabled', true);
+                $('[id^="delete_new_purchase_order_section_"]').attr('disabled', true);
+            },
+            success: function(data)
+            {
+                $('#add_new_purchase_order_section').parent().before(data);
+                $('.selectpicker').selectpicker('refresh');
+                $('#loader').hide();
+                $('#add_new_purchase_order_section').removeAttr('disabled');
+                $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('disabled');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of addNewPurchaseOrderSection comment block  ======*/
+
+
     function getSelectedProductAttributes() {
+
+        var selected_options = $('[id^="product_attribute_"] option:selected');// $(' option:selected');
+        var length = selected_options.length;
+        var options_arr = [];
+        for(var i=0; i < length; i++){
+            options_arr.push(selected_options.eq(i).text());
+        }
+
+        var index = options_arr.indexOf("Choose one or more...");
+
+        if (index != -1) {
+            options_arr.splice(index, 1);
+        }
+
+        options_arr = $.grep(options_arr, function(n){ return (n); });
+
+        return options_arr;
+    }
+
+    function getSelectedPurchaseOrderAttributes() {
 
         var selected_options = $('[id^="product_attribute_"] option:selected');// $(' option:selected');
         var length = selected_options.length;
@@ -1125,6 +1386,56 @@ $(function() {
     }
 
     /*=====  End of getProductDetailOptions comment block  ======*/
+
+    /*=============================================
+     =  getProductDetailOptions comment block     =
+     =============================================*/
+
+    function getProductDetailOptionsForPurchase(id, product_attribute, selected_text, product_attribute_detail_values, product_id)
+    {
+        var url = base_url + '/admin/product/get_product_details_options_by_product_id';
+
+        var product_attribute_detail_values = product_attribute_detail_values || '';
+
+        var data = {
+                'product_attribute': product_attribute, 'selected_text': selected_text,
+                'product_attribute_detail_values': product_attribute_detail_values,
+                'product_id': product_id
+            };
+
+        // calling ajax
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function(data)
+            {
+                $('select[id^="product_attribute_"] option:not(:selected)').removeAttr('disabled');
+                $('.selectpicker').selectpicker('refresh');
+                var options_arr = getSelectedProductAttributes();
+                for(var i= 0, length = options_arr.length; i < length; i++){
+                    $('#product_attribute_' + id + ' option:contains(' + ucWords(options_arr[i]) + ')').attr('disabled', true);
+                }
+                $('#product_attribute_' + id + ' .selectpicker').selectpicker('refresh');
+
+                $('#product_attr_details_' + id).empty();
+                $('#product_attr_details_' + id).append(data);
+                //$('#product_attr_details_' + id + ' .selectpicker').selectpicker('refresh');
+
+                //if($('#product_attr_details_' + id + ' option').length == 1) {
+                    //
+                //}
+
+                $('.selectpicker').selectpicker('refresh');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of getProductDetailOptionsForPurchase comment block  ======*/
 
     /*=============================================
      =      imageIsLoaded comment block            =

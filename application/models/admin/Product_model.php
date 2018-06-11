@@ -14,6 +14,8 @@ class Product_model extends CI_Model {
 
         $this->category = (trim($this->db->escape($this->input->post('category')), "' "));
 
+        $this->company = (trim($this->db->escape($this->input->post('company')), "' "));
+
         // if image is empty then set default flag i.e. no_image_600.png
         $this->image = empty($image) ? 'no_image_600.png' : $image;
 
@@ -30,6 +32,8 @@ class Product_model extends CI_Model {
             'name' => $this->name,
 
             'category' => $this->category,
+
+            'company' => $this->company,
 
             'image' => $this->image,
 
@@ -89,6 +93,8 @@ class Product_model extends CI_Model {
 
         $this->category = (trim($this->db->escape($this->input->post('category')), "' "));
 
+        $this->company = (trim($this->db->escape($this->input->post('company')), "' "));
+
         if(!empty($image))
         {
             $this->image = trim($this->db->escape($image), "' ");
@@ -101,6 +107,8 @@ class Product_model extends CI_Model {
             'name' => $this->name,
 
             'category' => $this->category,
+
+            'company' => $this->company,
 
             'image' => $this->image,
 
@@ -213,7 +221,19 @@ class Product_model extends CI_Model {
     {
         $this->db->select('`product`.`id`, `product`.`name`');
         $this->db->order_by('`product`.`name`');
-        $query = $this->db->get('`product`');
+        $this->db->from('`product`');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+
+    public function get_products_by_company_id($product_company)
+    {
+        $this->db->select('`product`.`id`, `product`.`name`');
+        $this->db->order_by('`product`.`name`');
+        $this->db->from('`product`');
+        $this->db->where('`product`.`company`', $product_company);
+        $query = $this->db->get();
         $result = $query->result_array();
         return $result;
     }
@@ -298,11 +318,11 @@ class Product_model extends CI_Model {
 
     public function record_count($params=array())
     {
-        if(!isset($params['name']) && !isset($params['category'])) {
+        if(!isset($params['name']) && !isset($params['category']) && !isset($params['company'])) {
             return $this->db->count_all("product");
         }
 
-        if(isset($params['name']) || isset($params['category'])) {
+        if(isset($params['name']) || isset($params['category']) || isset($params['company']) ) {
             $this->db->select('COUNT(id) as total');
         }
 
@@ -327,6 +347,12 @@ class Product_model extends CI_Model {
         if(isset($params['category'])) {
             if(!empty($params['category'])) {
                 $this->db->where('`category`',$params['category']);
+            }
+        }
+
+        if(isset($params['company'])) {
+            if(!empty($params['company'])) {
+                $this->db->where('`company`',$params['company']);
             }
         }
 
@@ -374,6 +400,12 @@ class Product_model extends CI_Model {
             }
         }
 
+        if(isset($params['company'])) {
+            if(!empty($params['company'])) {
+                $this->db->where('company', $params['company']);
+            }
+        }
+
         $this->db->order_by('`product`.`id`', 'desc');
 
         $this->db->from('product');
@@ -385,7 +417,6 @@ class Product_model extends CI_Model {
         }
 
         $query = $this->db->get();
-//        echo $this->db->last_query();
         if ($query->num_rows() > 0) {
             $result = $query->result_array();
             if(!isset($params['has_category_join'])) {
@@ -443,7 +474,7 @@ class Product_model extends CI_Model {
             $this->db->select('`product`.`id`, `product`.`name`');
         }
         else {
-            $this->db->select('`product`.`id`, `product`.`name`, `product`.`category`, `product`.`image`, `product`.`profile_image`, `product`.`thumbnail`');
+            $this->db->select('`product`.`id`, `product`.`name`, `product`.`category`, `product`.`company`, `product`.`image`, `product`.`profile_image`, `product`.`thumbnail`');
         }
         $this->db->from('product');
         if($only_category_join) {
@@ -514,4 +545,49 @@ class Product_model extends CI_Model {
         return array();
     }
 
+    public function get_product_specific_attributes($product_id) {
+        $this->db->select('DISTINCT(`product_detail`.`product_attribute_detail_id`) AS product_attributes');
+        $this->db->from('`product_detail`');
+        $this->db->where('`product_detail`.`product_id`', $product_id);
+        $q = $this->db->get();
+        if($q->num_rows() > 0) {
+            $result = $q->result_array();
+            $result = array_column($result, 'product_attributes');
+            $result = $this->get_product_attr_name_by_id($result);
+            return $result;
+        }
+        return array();
+    }
+
+    public function get_product_attr_name_by_id($product_attrs) {
+        $formatted_product_attrs = array();
+        foreach ($product_attrs as $product_attr) {
+            $formatted_product_attrs[$product_attr] = $this->product_attribute_model->get_product_attr_name_by_id($product_attr);
+        }
+        return $formatted_product_attrs;
+    }
+
+    public function get_product_attr_detail_name_by_id($product_attr_details) {
+        $formatted_product_attr_details = array();
+        foreach ($product_attr_details as $product_attr) {
+            $formatted_product_attr_details[$product_attr] = $this->product_attribute_detail_model->get_product_attribute_detail_name_by_id($product_attr);
+        }
+        return $formatted_product_attr_details;
+    }
+
+    public function get_product_attr_detail_by_prod_id($product_id, $product_attr_id) {
+        $this->db->select('DISTINCT(`product_detail`.`product_attribute_detail_value`) AS product_attribute_details');
+        $this->db->from('`product_detail`');
+        $this->db->where(array('`product_detail`.`product_id`' => $product_id,
+                                '`product_detail`.`product_attribute_detail_id`' => $product_attr_id));
+        $q = $this->db->get();
+        echo $this->db->last_query();
+        if($q->num_rows() > 0) {
+            $result = $q->result_array();
+            $result = array_column($result, 'product_attribute_details');
+            $result = $this->get_product_attr_detail_name_by_id($result);
+            return $result;
+        }
+        return array();
+    }
 }

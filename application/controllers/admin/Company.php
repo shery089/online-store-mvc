@@ -86,7 +86,7 @@ class Company extends PD_Photo
 		$this->form_validation->set_rules(
 
                 'name', 'Name',
-				'trim|required|min_length[2]|max_length[255]',
+				'trim|required|min_length[2]|max_length[255]|is_unique[company.name]',
 				array(
 						'required' => '%s is required',
 						'min_length' => '%s should be at least %s chars',
@@ -244,7 +244,7 @@ class Company extends PD_Photo
         $this->form_validation->set_rules(
 
             'name', 'Name',
-            'trim|required|min_length[2]|max_length[255]',
+            'trim|required|min_length[2]|max_length[255]|callback_edit_unique[company.name.'. $id .']',
             array(
                 'required' => '%s is required',
                 'min_length' => '%s should be at least %s chars',

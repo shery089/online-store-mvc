@@ -76,3 +76,18 @@ function custom_echo($arr, $col, $case_change = '') {
 function in_array_r($item , $array){
     return preg_match('/"'.$item.'"/i' , json_encode($array));
 }
+
+function get_partial_array_indices($array, $str, $start, $end){
+    $indices = [];
+    foreach($array as $key=>$value){
+        if($str == substr($key, $start,$end)){
+            $indices[] = substr($key,strrpos($key,'_'));
+        }
+    }
+
+    foreach($indices as $key=>$value){
+        $indices[$key]=str_replace("_","",$value);
+    }
+
+    return $indices;
+}

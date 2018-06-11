@@ -27,9 +27,35 @@
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
+			<div class="col-lg-3">
+				<div class="form-group custom-search-form">
+					<div class="form-group">
+						<?php
 
-			<div class="col-lg-3"></div>
-			<div class="col-lg-4">
+						$data = array(
+
+								'class'         => 'form-control selectpicker',
+								'id'            => 'search_by_product_company',
+								'title'         => 'Choose a Company'
+						);
+
+						$options = array();
+
+						foreach ($companies as $company)
+						{
+							$id = $company['id'];
+                            $options[$id] = ucwords(entity_decode($company['name']));
+						}
+
+						$selected = $this->input->post('search_by_product_company');
+
+						?>
+						<?= form_dropdown('search_by_product_company', $options, $selected, $data); ?>
+
+					</div>
+				</div>
+			</div>
+            <div class="col-lg-4">
 				<div class="form-group custom-search-form">
 					<div class="form-group">
 						<?php
@@ -41,8 +67,7 @@
 								'title'         => 'Choose a Category'
 						);
 
-						$options[''] = '';
-
+                        $options = array();
 						foreach ($categories as $category)
 						{
 							$id = $category['id'];

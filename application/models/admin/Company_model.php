@@ -334,4 +334,15 @@
 
             return array();
         }
+
+        public function get_companies_dropdown() {
+            $this->db->select('`company`.`id`, `company`.`name`');
+            $this->db->from('`company`');
+            $q = $this->db->get();
+            if($q->num_rows() > 0) {
+                $result = $q->result_array();
+                return $result;
+            }
+            return array();
+        }
     }

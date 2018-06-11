@@ -10,6 +10,7 @@ class Product extends PD_Photo {
 		$this->load->library('layouts');	
 		$this->load->model('admin/product_model');
 		$this->load->model('admin/category_model');
+		$this->load->model('admin/company_model');
 		$this->load->model('admin/product_attribute_model');
 		$this->load->model('admin/product_attribute_detail_model');
 	}
@@ -51,6 +52,8 @@ class Product extends PD_Photo {
 		$data["products"] = $this->fetch_products($config["per_page"], $current_page);
 
 		$data['categories'] = $this->category_model->get_all_categories();
+
+		$data['companies'] = $this->company_model->get_companies_dropdown();
 
 		$data["links"] = $this->pagination->create_links();
 
@@ -104,6 +107,17 @@ class Product extends PD_Photo {
 		$this->form_validation->set_rules(
 
     		'category', 'Category',
+    		'required',
+        	array(
+            	'required'      => '%s is required'
+    		)
+	    );
+
+		// Product Company
+
+		$this->form_validation->set_rules(
+
+    		'company', 'Company',
     		'required',
         	array(
             	'required'      => '%s is required'
@@ -165,6 +179,7 @@ class Product extends PD_Photo {
 			else // if not an ajax call
 			{
 				$data['categories'] = $this->category_model->get_all_categories();
+                $data['companies'] = $this->company_model->get_companies_dropdown();
 				$data['product_attributes'] = $this->product_attribute_model->get_product_attributes_dropdown();
 				$this->layouts->view('templates/admin/add_product', $data);
 			}
@@ -382,6 +397,7 @@ class Product extends PD_Photo {
 		);
 
 		$data['categories'] = $this->category_model->get_all_categories();
+        $data['companies'] = $this->company_model->get_companies_dropdown();
 		$product_attributes = $this->product_attribute_model->get_product_attributes_dropdown();
 		$data['product_attributes'] = $product_attributes;
 
@@ -651,13 +667,59 @@ class Product extends PD_Photo {
 	public function fetch_products($per_page, $current_page)
 	{
 		$product_category = isset($_POST['product_category']) && is_numeric($_POST['product_category']);
+		$product_company = isset($_POST['product_company']) && is_numeric($_POST['product_company']);
 		$product_name = isset($_POST['product_name']) && !empty($_POST['product_name']);
 		$product_category_ac_id = $this->input->post('product_category');
+		$product_company_ac_id = $this->input->post('product_company');
 		$product_name_ac = strtolower($this->input->post('product_name'));
-
 		$product_name_ac = str_replace('-', ' - ', $product_name_ac);
 
-		if($product_category) {
+        if($product_company && $product_name && $product_category) {
+            $products = $this->product_model->fetch_products(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'company' => $product_company_ac_id,
+                    'name' => $product_name_ac,
+                    'category' => $product_category_ac_id,
+                    'has_category_join' => TRUE
+                )
+            );
+        }
+
+        else if($product_category && $product_name) {
+            $products = $this->product_model->fetch_products(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'category' => $product_category_ac_id,
+                    'name' => $product_name_ac,
+                    'has_category_join' => TRUE
+                )
+            );
+        }
+
+        else if($product_company && $product_category) {
+            $products = $this->product_model->fetch_products(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'company' => $product_company_ac_id,
+                    'category' => $product_category_ac_id,
+                    'has_category_join' => TRUE
+                )
+            );
+        }
+
+        else if($product_company && $product_name) {
+            $products = $this->product_model->fetch_products(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'company' => $product_company_ac_id,
+                    'name' => $product_name_ac,
+                    'has_category_join' => TRUE
+                )
+            );
+        }
+
+        else if($product_category) {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
@@ -667,27 +729,24 @@ class Product extends PD_Photo {
             );
 		}
 
-		if($product_name) {
+        else if($product_company) {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
-                    'name' => $product_name_ac,
+                    'company' => $product_company_ac_id,
                     'has_category_join' => TRUE
                 )
             );
 		}
 
-		if($product_category && $product_name) {
-
+        else if($product_name) {
             $products = $this->product_model->fetch_products(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
-                    'category' => $product_category_ac_id,
                     'name' => $product_name_ac,
                     'has_category_join' => TRUE
                 )
             );
-
 		}
 
         if(!$this->input->is_ajax_request()) {
@@ -709,25 +768,60 @@ class Product extends PD_Photo {
     public function products_count()
     {
         $category_cond = isset($_POST['product_category']) && is_numeric($_POST['product_category']);
+        $product_company_cond = isset($_POST['product_company']) && is_numeric($_POST['product_company']);
         $category = $this->input->post('product_category');
+        $product_company = $this->input->post('product_company');
         $product_name = strtolower($this->input->post('product_name'));
-        if($category_cond) {
+
+        if($category_cond && !empty($_POST['product_name']) && $product_company_cond) {
+            $products = $this->product_model->record_count(array(
+                    'category' => $category,
+                    'name' => $product_name,
+                    'company' => $product_company
+                )
+            );
+        }
+
+        else if($category_cond && !empty($_POST['product_name'])) {
+            $products = $this->product_model->record_count(array(
+                    'category' => $category,
+                    'name' => $product_name,
+                )
+            );
+        }
+
+        else if($product_company_cond && !empty($_POST['product_name'])) {
+            $products = $this->product_model->record_count(array(
+                    'company' => $product_company,
+                    'name' => $product_name,
+                )
+            );
+        }
+
+        else if($category_cond && $product_company_cond) {
+            $products = $this->product_model->record_count(array(
+                    'category' => $category,
+                    'company' => $product_company,
+                )
+            );
+        }
+
+        else if($category_cond) {
             $products = $this->product_model->record_count(array(
                     'category' => $category
                 )
             );
         }
 
-        if(!empty($_POST['product_name'])) {
+        else if($product_company_cond) {
             $products = $this->product_model->record_count(array(
-                    'name' => $product_name
+                    'company' => $product_company
                 )
             );
         }
 
-        if($category_cond && !empty($_POST['product_name'])) {
+        else if(!empty($_POST['product_name'])) {
             $products = $this->product_model->record_count(array(
-                    'category' => $category,
                     'name' => $product_name
                 )
             );
@@ -745,10 +839,12 @@ class Product extends PD_Photo {
     public function set_product_search_filter() {
         $product_category = trim($this->input->post('product_category'));
         $product_name = trim($this->input->post('product_name'));
-        if(!empty($product_category) || !empty($product_name)) {
+        $product_company = trim($this->input->post('product_company'));
+        if(!empty($product_category) || !empty($product_name) || !empty($product_company)) {
             $this->session->set_userdata(array(
                     'product_category' 	=> $product_category,
-                    'product_name' => $product_name
+                    'product_name' => $product_name,
+                    'product_company' => $product_company
                 )
             );
         }
@@ -759,6 +855,8 @@ class Product extends PD_Photo {
         $session_product_name = $this->session->userdata('product_name');
         $product_name = $this->input->post('product_name');
         $session_product_category = $this->session->userdata('product_category');
+        $session_product_company = $this->session->userdata('product_company');
+        $product_company = $this->input->post('product_company');
         $product_category = $this->input->post('product_category');
 
         if(empty($product_name)) {
@@ -768,12 +866,49 @@ class Product extends PD_Photo {
         if(empty($product_category)) {
             $_POST['product_category'] = $session_product_category;
         }
+
+        if(empty($product_company)) {
+            $_POST['product_company'] = $session_product_company;
+        }
     }
 
     public function unset_product_search_filter() {
         $this->session->unset_userdata(array(
-                'product_name', 'product_category'
+                'product_name', 'product_category', 'product_company'
             )
         );
+    }
+
+    public function get_product_specific_attributes() {
+        $product_attrs_html = '';
+        $product_id = $this->input->post('product_id');
+        $product_attrs = $this->product_model->get_product_specific_attributes($product_id);
+        if(!empty($product_attrs)) {
+            foreach ($product_attrs as $product_attr_key => $product_attr_val) {
+                $product_attrs_html .= '<option value="' . $product_attr_key . '">' . $product_attr_val . '</option>';
+            }
+            echo $product_attrs_html;
+        }
+    }
+
+    public function get_products_by_company_id() {
+        $products_html = '';
+        $product_company = $this->input->post('product_company');
+        $products = $this->product_model->get_products_by_company_id($product_company);
+        if(!empty($products)) {
+            foreach ($products as $product) {
+                $products_html .= '<option value="' . $product['id'] . '">' . ucwords($product['name']) . '</option>';
+            }
+            echo $products_html;
+        }
+    }
+
+    public function get_product_details_options_by_product_id()
+    {
+        $data['product_attribute_details'] = $this->product_model->get_product_attr_detail_by_prod_id(
+                                                $this->input->post('product_id'),
+                                                $this->input->post('product_attribute')
+                                            );
+        $this->load->view('templates/admin/product_attribute_detail_purchase_dropdown', $data);
     }
 }

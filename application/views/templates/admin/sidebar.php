@@ -37,7 +37,14 @@
                     <!-- /.nav-second-level -->
                 </li>
 
-            </ul>    
+                <li>
+                    <a href="<?= site_url('admin/purchase_order'); ?>"><i class="fa fa-credit-card fa-fw"></i> Purchase Order</a>
+                </li>
+
+                <li>
+                    <a href="<?= site_url('admin/sales_order'); ?>"><i class="fa fa-shopping-cart fa-fw"></i> Sales Order</a>
+                </li>
+            </ul>
         </div>
         <!-- /.sidebar-collapse -->
     </div>

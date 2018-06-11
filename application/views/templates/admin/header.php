@@ -71,6 +71,8 @@
             <ul class="nav navbar-top-links navbar-right">
                 <li class="active"><a href="<?= base_url('admin/product') ?>">Product</a></li>
                 <li><a href="<?= base_url('admin/user') ?>">User</a></li>
+                <li><a href="<?= base_url('admin/purchase_order') ?>">Purchase Order</a></li>
+                <li><a href="<?= base_url('admin/sales_order') ?>">Sales Order</a></li>
                 <!-- /.dropdown -->
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">

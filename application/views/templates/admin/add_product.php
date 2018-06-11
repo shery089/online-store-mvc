@@ -70,7 +70,39 @@
                 <?= form_dropdown('category', $options, $selected, $data); ?>
                 <div id="category_error"></div>
             </div>
+        </div>
 
+        <!-- Company -->
+
+        <div class="col-lg-12">
+            <div class="form-group">
+                <?= form_label('Company: ', 'company'); ?>
+                <?php
+
+                    $data = array(
+
+                        'class'         => 'form-control selectpicker',
+                        'id'            => 'company',
+                        'name'          => 'company',
+                        'title'         => 'Choose a company',
+                        'data-live-search'  => TRUE
+
+                    );
+
+                    $options = [];
+
+                    foreach ($companies as $company)
+                    {
+                        $id = $company['id'];
+                        $options[$id] = ucwords(entity_decode($company['name']));
+                    }
+
+                    $selected = $this->input->post('company');
+
+                ?>
+                <?= form_dropdown('company', $options, $selected, $data); ?>
+                <div id="company_error"></div>
+            </div>
         </div>
 
         <!-- Product Attribute -->
