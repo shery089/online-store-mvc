@@ -53,8 +53,8 @@
 							<?php $function = strlen($product_attribute_detail['product_attribute_value']) <= 3 ? 'strtoupper' : 'ucwords' ?>
 				   			<td style="background-color: <?= $is_color > 0 ? (entity_decode($product_attribute_detail['product_attribute_value'])) : '' ?>"> <?= $is_color > 0 ? '' : $function(entity_decode($product_attribute_detail['product_attribute_value'])); ?></td>
 				   			<td>
-				   				<a href="<?= base_url('admin/product_attribute_detail/edit_product_attribute_detail_lookup/') . '/' . $product_attribute_detail['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-								<a href="javascript:void(0)" id="delete_<?= $product_attribute_detail['id']; ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
+				   				<a href="<?= base_url('admin/product_attribute_detail/edit_product_attribute_detail_lookup/') . '/' . $product_attribute_detail['id']; ?>" class="btn btn-sm btn-success actions"><span class="fa fa-pencil-alt"></span></a>
+								<a href="javascript:void(0)" id="delete_<?= $product_attribute_detail['id']; ?>" class="btn btn-sm btn-danger actions"><span class="fa fa-window-close"></span></a>
 				   				<a href="javascript:void(0)" id="view_<?= $product_attribute_detail['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   			</td>
 				   		</tr>

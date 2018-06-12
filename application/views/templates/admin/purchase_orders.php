@@ -27,6 +27,7 @@
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
+            <form id="purchase_product_form">
             <div class="col-lg-3">
                 <div class="form-group custom-search-form">
                     <div class="form-group">
@@ -36,6 +37,7 @@
 
                             'class'         => 'form-control selectpicker',
                             'id'            => 'search_by_product_company',
+                            'name'          => 'product_company',
                             'title'         => 'Choose a Company'
                         );
 
@@ -64,6 +66,7 @@
 
                             'class'         => 'form-control selectpicker',
                             'id'            => 'search_by_product_id',
+                            'name'          => 'product_id',
                             'title'         => 'Choose a Product',
                             'data-live-search'  => TRUE
                         );
@@ -80,19 +83,40 @@
             </div>
 
 			<div class="col-lg-4">
-			</div>
+                <div class="form-group custom-search-form">
+                    <?php
+                    $data = array(
+
+                        'class'         => 'form-control',
+                        'name'          => 'quantity',
+                        'type'          => 'number',
+                        'id'            => 'search_by_quantity',
+                        'min'           => '1',
+                        'placeholder'   => 'Quantity'
+                    );
+                    ?>
+                    <?= form_input($data); ?>
+                </div>
+            </div>
 
             <div class="col-lg-1">
                 <a href="<?= base_url('admin/purchase_order') ?>" class="btn btn-warning" type="button">Reset <i class="fa fa-undo"></i></a>
             </div>
+
+            </form>
+
+            <?php if($layout_title !== 'Inventory'): ?>
 
 			<!-- Add Product Button -->
 			<div class="form-group text-left" style="margin-top: 55px">
 				<a href="<?= site_url('admin/purchase_order/add_purchase_order_lookup'); ?>" class="btn btn-primary">Add New</a>
 			</div>
 
+            <?php endif; ?>
+
+
      		<?php if(!empty($purchase_orders)): ?>
-			<div id="searched_results">
+			<div id="searched_results" style="<?= $layout_title === 'Inventory' ? 'margin-top: 55px' : ''; ?>">
 			<div class="table-responsive">
 				<table class="table table-bordered table-striped table">
 					<col width="150">
@@ -132,7 +156,7 @@
                             <td><?= ucwords($purchase_order['purchase_price']); ?></td>
                             <td><?= ucwords($purchase_order['sale_price']); ?></td>
 				   			<td>
-				   				<a title="Edit Product" href="<?= base_url('admin/purchase_order/edit_purchase_order_lookup') . '/' . ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-square-o"></span></a>
+				   				<a title="Edit Product" href="<?= base_url('admin/purchase_order/edit_purchase_order_lookup') . '/' . ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-alt"></span></a>
 <!--								<a title="Delete Product" href="javascript:void(0)" id="delete_--><?//= ucwords($purchase_order['id']); ?><!--" class="btn btn-sm btn-danger actions" style="display: inline-block;"><span class="fa fa-close"></span></a>-->
 								<a title="Product Details" href="javascript:void(0)" id="view_<?= ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-info actions" style="display: inline-block;"><span class="fa fa-eye "></span></a>
 							</td>

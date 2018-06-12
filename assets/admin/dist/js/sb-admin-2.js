@@ -630,7 +630,7 @@ $(function() {
     });
 
     $(document).on('change', '#search_by_product_company', function() {
-        if($.inArray('purchase_order', path_parts) !== -1) {
+        if($.inArray('purchase_order', path_parts) !== -1 || $.inArray('inventory', path_parts) !== -1) {
             purchaseOrderSearch();
             getProductsByCompanyId();
         }
@@ -640,7 +640,7 @@ $(function() {
     });
 
     $(document).on('change', '#search_by_product_id', function() {
-        if($.inArray('purchase_order', path_parts) !== -1) {
+        if($.inArray('purchase_order', path_parts) !== -1 || $.inArray('inventory', path_parts) !== -1) {
             purchaseOrderSearch();
         }
         else {
@@ -660,6 +660,29 @@ $(function() {
 
     $(document).on('click', '#user_search_btn', function(e) {
         userSearch();
+    });
+
+    $(document).on('keypress', '#search_by_quantity', function(e) {
+        var _this = $(this);
+        var value = _this.val();
+        if($.isNumeric(value)) {
+            _this.addClass('text-right');
+        }
+        if(value.length == 0) {
+            _this.removeClass('text-right');
+        }
+
+        if(e.which === 13) {
+            purchaseOrderSearch();
+        }
+
+    });
+
+    $(document).on('focusout', '#search_by_quantity', function(e) {
+        var _this = $(this);
+        if(_this.val().length == 0) {
+            _this.removeClass('text-right');
+        }
     });
 
     $(document).on('keypress', '#search_by_company_name, #search_by_company_email', function(e) {
@@ -697,9 +720,9 @@ $(function() {
     function purchaseOrderSearch() {
         var product_company = $.trim($('#search_by_product_company').val());
         var product_id = $.trim($('#search_by_product_id').val());
-
-        if(product_company.length > 0 || product_id.length > 0) {
-            searchPurchaseOrder(product_id, product_company);
+        var product_quantity = $.trim($('#search_by_quantity').val());
+        if(product_company.length > 0 || product_id.length > 0 || product_quantity.length > 0) {
+            searchPurchaseOrder(product_company, product_id, product_quantity);
         }
     }
 
@@ -1168,11 +1191,11 @@ $(function() {
     /*=============================================
      =      searchPurchaseOrder comment block     =
      =============================================*/
-    function searchPurchaseOrder(product_id, product_company)
+    function searchPurchaseOrder(product_company, product_id, product_quantity)
     {
-        var data = {'product_id': product_id, 'product_company': product_company};
-        // calling ajax
+        var data = {'product_id': product_id, 'product_company': product_company, 'product_quantity': product_quantity};
 
+        // calling ajax
         $.ajax({
             url: base_url + '/admin/purchase_order/search_purchase_order_lookup/',
             method: 'post',

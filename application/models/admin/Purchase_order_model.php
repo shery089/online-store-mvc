@@ -168,11 +168,22 @@
                 }
             }
 
-            $this->db->where(array(
-                '`product_detail`.`quantity` != ' => 0,
-                '`product_detail`.`purchase_price` != ' => 0,
-                '`product_detail`.`sale_price` != ' => 0
-            ));
+            if(isset($params['product_quantity'])) {
+                if(!empty($params['product_quantity'])) {
+                    $this->db->where(array(
+                        '`product_detail`.`quantity` >= ' => $params['product_quantity'],
+                        '`product_detail`.`purchase_price` != ' => 0,
+                        '`product_detail`.`sale_price` != ' => 0
+                    ));
+                }
+            }
+            else {
+                $this->db->where(array(
+                    '`product_detail`.`quantity` != ' => 0,
+                    '`product_detail`.`purchase_price` != ' => 0,
+                    '`product_detail`.`sale_price` != ' => 0
+                ));
+            }
 
             $query = $this->db->get();
             $result = $query->result_array();
@@ -208,6 +219,12 @@
             if(isset($params['product_company'])) {
                 if(!empty($params['product_company'])) {
                     $this->db->where('`product`.`company`', $params['product_company']);
+                }
+            }
+
+            if(isset($params['product_quantity'])) {
+                if(!empty($params['product_quantity'])) {
+                    $this->db->where('`quantity` <= ', $params['product_quantity']);
                 }
             }
 

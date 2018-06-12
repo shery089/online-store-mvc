@@ -134,7 +134,7 @@
 							<td><?= ucwords($product['name']); ?></td>
 				   			<td><?= ucwords($product['category']); ?></td>
 				   			<td>
-				   				<a title="Edit Product" href="<?= base_url('admin/product/edit_product_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-square-o"></span></a>
+				   				<a title="Edit Product" href="<?= base_url('admin/product/edit_product_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-alt"></span></a>
 								<a title="Product Gallery" href="<?= base_url('admin/gallery/add_gallery_pics_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-warning actions" style="display: inline-block;"><span class="fa fa-photo"></span></a>
 								<a title="Edit Product Description" href="<?= base_url('admin/product/edit_product_description_lookup') . '/' . ucwords($product['id']); ?>" class="btn btn-sm btn-primary actions" style="display: inline-block;"><span class="fa fa-pencil-square"></span></a>
 								<a title="Delete Product" href="javascript:void(0)" id="delete_<?= ucwords($product['id']); ?>" class="btn btn-sm btn-danger actions" style="display: inline-block;"><span class="fa fa-close"></span></a>

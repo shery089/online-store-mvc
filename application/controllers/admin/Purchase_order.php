@@ -20,7 +20,9 @@ class Purchase_order extends PD_Photo
 			$this->search_purchase_order_lookup();
 		}
 
-		$this->layouts->set_title('Purchase Orders');
+        $title = $this->uri->segment(2) == 'inventory' ? 'Inventory' : 'Purchase Orders';
+
+		$this->layouts->set_title($title);
 
 		$current_page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
 
@@ -449,15 +451,51 @@ class Purchase_order extends PD_Photo
 	 */
 	public function fetch_purchase_orders_lookup($per_page, $current_page)
 	{
+	    if(isset($_REQUEST['product_id'])) {
+            $_POST['product_id'] = $_REQUEST['product_id'];
+        }
+
         $product_ac_id = $this->input->post('product_id');
         $product_ac_company = strtolower($this->input->post('product_company'));
+        $product_ac_quantity = $this->input->post('product_quantity');
 
-        if(!empty($_POST['product_id']) && !empty($_POST['product_company'])) {
+        if(!empty($_POST['product_id']) && !empty($_POST['product_company']) && !empty($_POST['product_quantity'])) {
+            $purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'product_company' => $product_ac_company,
+                    'product_id' => $product_ac_id,
+                    'product_quantity' => $product_ac_quantity,
+                )
+            );
+        }
+
+        else if(!empty($_POST['product_id']) && !empty($_POST['product_company'])) {
             $purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
                     'per_page' => $per_page,
                     'current_page' => $current_page,
                     'product_company' => $product_ac_company,
                     'product_id' => $product_ac_id
+                )
+            );
+        }
+
+        else if(!empty($_POST['product_id']) && !empty($_POST['product_quantity'])) {
+            $purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'product_id' => $product_ac_id,
+                    'product_quantity' => $product_ac_quantity
+                )
+            );
+        }
+
+        else if(!empty($_POST['product_company']) && !empty($_POST['product_quantity'])) {
+            $purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
+                    'per_page' => $per_page,
+                    'current_page' => $current_page,
+                    'product_company' => $product_ac_company,
+                    'product_quantity' => $product_ac_quantity
                 )
             );
         }
@@ -480,6 +518,15 @@ class Purchase_order extends PD_Photo
 			);
 		}
 
+		else if(!empty($_POST['product_quantity'])) {
+			$purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
+				'per_page' => $per_page,
+				'current_page' => $current_page,
+				'product_quantity' => $product_ac_quantity
+				)
+			);
+		}
+
 		if(!$this->input->is_ajax_request()) {
 			$purchase_orders = $this->purchase_order_model->fetch_purchase_orders(array(
 				'per_page' => $per_page,
@@ -497,32 +544,70 @@ class Purchase_order extends PD_Photo
 	 */
 	public function purchase_orders_count()
 	{
+        if(isset($_REQUEST['product_id'])) {
+            $_POST['product_id'] = $_REQUEST['product_id'];
+        }
+
 		$product_id = isset($_POST['product_id']) && !empty($_POST['product_id']);
 		$product_company = isset($_POST['product_company']) && !empty($_POST['product_company']);
+		$product_quantity = isset($_POST['product_quantity']) && !empty($_POST['product_quantity']);
 		$product_ac_id = $this->input->post('product_id');
 		$product_ac_company = strtolower($this->input->post('product_company'));
-        
-		if($product_id) {
-			$purchase_orders = $this->purchase_order_model->record_count(array(
-				'product_id' => $product_ac_id
-				)
-			);
-		}
+		$product_ac_quantity = $this->input->post('product_quantity');
 
-		if($product_company) {
+		if($product_id && $product_quantity && $product_company) {
 			$purchase_orders = $this->purchase_order_model->record_count(array(
+			    'product_id' => $product_ac_id,
+                'product_quantity' => $product_ac_quantity,
 				'product_company' => $product_ac_company
 				)
 			);
 		}
 
-		if($product_id && $product_company) {
-			$purchase_orders = $this->purchase_order_model->record_count(array(
-				'product_id' => $product_ac_id,
-				'product_company' => $product_ac_company
-				)
-			);
-		}
+        else if($product_id && $product_company) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_id' => $product_ac_id,
+                    'product_company' => $product_ac_company
+                )
+            );
+        }
+
+        else if($product_id && $product_quantity) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_id' => $product_ac_id,
+                    'product_quantity' => $product_ac_quantity
+                )
+            );
+        }
+
+        else if($product_quantity && $product_company) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_quantity' => $product_ac_quantity,
+                    'product_company' => $product_ac_company
+                )
+            );
+        }
+
+        else if($product_id) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_id' => $product_ac_id
+                )
+            );
+        }
+
+        else if($product_company) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_company' => $product_ac_company
+                )
+            );
+        }
+
+        else if($product_quantity) {
+            $purchase_orders = $this->purchase_order_model->record_count(array(
+                    'product_quantity' => $product_ac_quantity
+                )
+            );
+        }
 
 		if(!$this->input->is_ajax_request()) {
 			$purchase_orders = $this->purchase_order_model->record_count();
@@ -536,10 +621,12 @@ class Purchase_order extends PD_Photo
 	public function set_purchase_order_search_filter() {
 		$product_company = trim($this->input->post('product_company'));
 		$product_id = trim($this->input->post('product_id'));
-		if(!empty($product_company) || !empty($product_id)) {
+		$product_quantity = trim($this->input->post('product_quantity'));
+		if(!empty($product_company) || !empty($product_id) || $product_quantity) {
 			$this->session->set_userdata(array(
-					'session_purcahse_order_product_company' 	=> $this->input->post('product_company'),
-					'session_purcahse_order_product_id' => $this->input->post('product_id')
+					'session_purcahse_order_product_company' 	=> $product_company,
+					'session_purcahse_order_product_id'         => $product_id,
+					'session_purcahse_order_product_quantity'   => $product_quantity
 				)
 			);
 		}
@@ -550,7 +637,9 @@ class Purchase_order extends PD_Photo
 		$session_product_company = $this->session->userdata('session_purcahse_order_product_company');
 		$product_company = $this->input->post('product_company');
 		$session_product_id = $this->session->userdata('session_purcahse_order_product_id');
-		$product_id = $this->input->post('product_id');
+        $product_id = $this->input->post('product_quantity');
+        $session_product_quantity = $this->session->userdata('session_purcahse_order_product_quantity');
+        $product_quantity = $this->input->post('product_quantity');
 
 		if(empty($product_company)) {
 			$_POST['product_company'] = $session_product_company;
@@ -559,11 +648,16 @@ class Purchase_order extends PD_Photo
 		if(empty($product_id)) {
 			$_POST['product_id'] = $session_product_id;
 		}
+
+		if(empty($product_quantity)) {
+			$_POST['product_quantity'] = $session_product_quantity;
+		}
 	}
 
 	public function unset_purchase_order_search_filter() {
 		$this->session->unset_userdata(array(
-				'session_purcahse_order_product_company', 'session_purcahse_order_product_id'
+				'session_purcahse_order_product_company', 'session_purcahse_order_product_id',
+                'session_purcahse_order_product_quantity'
 			)
 		);
 	}

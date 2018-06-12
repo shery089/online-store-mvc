@@ -82,8 +82,8 @@
 				   			<td><?= $company['email']; ?></td>
 				   			<td><?= ucwords($company['phone_number']); ?></td>
 				   			<td>
-				   				<a href="<?= base_url('admin/company/edit_company_lookup') . '/' . $company['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-								<a href="javascript:void(0)" id="delete_<?= $company['id']; ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
+				   				<a href="<?= base_url('admin/company/edit_company_lookup') . '/' . $company['id']; ?>" class="btn btn-sm btn-success actions"><span class="fa fa-pencil-alt"></span></a>
+								<a href="javascript:void(0)" id="delete_<?= $company['id']; ?>" class="btn btn-sm btn-danger actions"><span class="fa fa-window-close"></span></a>
 				   				<a href="javascript:void(0)" id="view_<?= $company['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   			</td>
 				   		</tr>

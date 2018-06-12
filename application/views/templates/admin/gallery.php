@@ -58,7 +58,7 @@
 				   			<td><?= ucwords(entity_decode($picture['full_name'])); ?></td>
 				   			<td><?= entity_decode($picture['uploaded_date']); ?></td>
 				   			<td style="display: inline-grid; margin-left: 10px;margin-top: 10px;">
-				   				<a href="<?= base_url('admin/gallery/edit_gallery_pics_lookup') . '/' . $picture['product_id'] . '/' . $picture['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
+				   				<a href="<?= base_url('admin/gallery/edit_gallery_pics_lookup') . '/' . $picture['product_id'] . '/' . $picture['id']; ?>" class="btn btn-sm btn-success actions"><span class="fa fa-pencil-alt"></span></a>
 								<a href="javascript:void(0)" id="delete_<?= $picture['id']; ?>" class="btn btn-sm btn-danger actions"><span class="fa fa-trash"></span></a>
 				   				<a href="javascript:void(0)" id="view_<?= $picture['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   				<a href="javascript:void(0)" id="feature_<?= $picture['id'] . '_' . $status ?>" class="btn btn-sm btn-primary actions"><span class="<?= $status == 0 ? 'fa fa-plus' : 'fa fa-minus'; ?>"></span></a>

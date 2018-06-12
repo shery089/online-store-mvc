@@ -50,30 +50,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 
-$route['default_controller'] = 'site';
-
-
-/*$route['admin/login'] = "admin/login";
-$route['admin/doctor_specialization'] = "admin/doctor_specialization";
-$route['admin/disease'] = "admin/disease";
-$route['admin/doctor'] = "admin/doctor";
-$route['admin/patient'] = "admin/patient";
-$route['admin/schedule'] = "admin/schedule";
-$route['admin/appointment'] = "admin/appointment";
-$route['admin/prescription'] = "admin/prescription";
-$route['admin/admin'] = "admin/admin";
-$route['admin/user'] = "admin/user";*/
-
-// $route['login'] = 'admin/login';
-// $route['appointment'] = 'admin/appointment';
-
-// $route['admin'] = 'admin/login';
-// $route['login'] = 'login';
-
-// $route['admin'] = "admin";
-
-// $route['admin/([a-z]+)/(:any)'] = "admin/login/$1/$2";
-
+$route['default_controller'] = '';
+$route['admin'] = 'admin/login';
+$route['admin/inventory'] = 'admin/purchase_order';
 $route['404_override'] = '';
-
 $route['translate_uri_dashes'] = FALSE;

@@ -61,7 +61,7 @@
 
         public function get_user($email)
         {
-            $roles = array('admin', 'editor', 'uploader');
+            $roles = array('admin', 'editor', 'sales');
             for ($i = 0; $i < 3; $i++) 
             { 
                 $role_ids[$i] = $this->role_model->get_role_id_by_name($roles[$i]);

@@ -107,8 +107,8 @@
 				   			<td><?= ucwords($user['mobile_number']); ?></td>
 				   			<td><?= ucwords($user['role']); ?></td>
 				   			<td>
-				   				<a href="<?= base_url('admin/user/edit_user_lookup') . '/' . $user['id']; ?>" class="btn btn-sm btn-success actions"><span class="glyphicon glyphicon-pencil"></span></a>
-								<a href="javascript:void(0)" id="delete_<?= $user['id']; ?>" class="btn btn-sm btn-danger actions"><span class="glyphicon glyphicon-remove-sign"></span></a>
+				   				<a href="<?= base_url('admin/user/edit_user_lookup') . '/' . $user['id']; ?>" class="btn btn-sm btn-success actions"><span class="fa fa-pencil-alt"></span></a>
+								<a href="javascript:void(0)" id="delete_<?= $user['id']; ?>" class="btn btn-sm btn-danger actions"><span class="fa fa-window-close"></span></a>
 				   				<a href="javascript:void(0)" id="view_<?= $user['id']; ?>" class="btn btn-sm btn-info actions"><span class="fa fa-eye"></span></a>
 				   			</td>
 				   		</tr>

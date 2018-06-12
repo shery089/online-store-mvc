@@ -38,11 +38,15 @@
                 </li>
 
                 <li>
-                    <a href="<?= site_url('admin/purchase_order'); ?>"><i class="fa fa-credit-card fa-fw"></i> Purchase Order</a>
+                    <a href="<?= site_url('admin/purchase_order'); ?>"><i class="fa fa-cart-arrow-down fa-fw"></i> Purchase Order</a>
                 </li>
 
                 <li>
                     <a href="<?= site_url('admin/sales_order'); ?>"><i class="fa fa-shopping-cart fa-fw"></i> Sales Order</a>
+                </li>
+
+                <li>
+                    <a href="<?= site_url('admin/inventory'); ?>"><i class="fa fa-box-open fa-fw"></i> Inventory</a>
                 </li>
             </ul>
         </div>
