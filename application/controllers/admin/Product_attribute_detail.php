@@ -22,6 +22,7 @@ class Product_attribute_detail extends CI_Controller {
 		$this->load->library('layouts');	
 		$this->load->model('admin/product_attribute_detail_model');
 		$this->load->model('admin/product_attribute_model');
+        $this->load->model('admin/configuration_model');
 	}
 	
 	/**
@@ -47,7 +48,7 @@ class Product_attribute_detail extends CI_Controller {
 		$config = array();
         $config["base_url"] = base_url('admin/') . '/'  . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 	    $config["total_rows"] = $this->product_attribute_detail_model->record_count();
-		$config['per_page'] = 9;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
         $config["uri_segment"] = 4;
 		$config["num_links"] = 1;
 		$config['full_tag_open'] = '<ul class="pagination">';

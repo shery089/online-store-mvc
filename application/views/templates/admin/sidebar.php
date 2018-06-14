@@ -48,6 +48,9 @@
                 <li>
                     <a href="<?= site_url('admin/inventory'); ?>"><i class="fa fa-box-open fa-fw"></i> Inventory</a>
                 </li>
+                <li>
+                    <a href="<?= site_url('admin/configuration'); ?>"><i class="fa fa-th fa-fw"></i> Configurations</a>
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

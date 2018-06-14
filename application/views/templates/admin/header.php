@@ -73,19 +73,34 @@
                 <li><a href="<?= base_url('admin/user') ?>">User</a></li>
                 <li><a href="<?= base_url('admin/purchase_order') ?>">Purchase Order</a></li>
                 <li><a href="<?= base_url('admin/sales_order') ?>">Sales Order</a></li>
-                <!-- /.dropdown -->
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                    <i class="fa fa-bell fa-fw"></i>
+                    <span class="badge"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                        <a href="#"><div><i class="fa fa-comment fa-fw"></i>
+                            New Comment <span class="pull-right text-muted small">4 minutes ago</span></div>
+                        </a>
+                        </li>
+                        <li class="divider"></li>
+                    </ul>
+                <!-- /.dropdown-alerts -->
+                </li>
+
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <?= isset($this->session->userdata['admin_record']) ? array_column($this->session->userdata['admin_record'], 'user_name')[0] : '' ?>
                         <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="<?= isset($this->session->userdata['admin_record']) ? base_url('admin/user/edit_user_lookup') . '/' . array_column($this->session->userdata['admin_record'], 'id')[0] : '' ?>"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                        </li>
-                        <li><a href="<?= base_url('admin/user/change_password_lookup') ?>"><i class="fa fa-lock fa-fw"></i> Change Password</a>
-                        </li>
+                        <li><a href="<?= isset($this->session->userdata['admin_record']) ? base_url('admin/user/edit_user_lookup') . '/' . array_column($this->session->userdata['admin_record'], 'id')[0] : '' ?>"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
+                        <li><a href="<?= base_url('admin/user/change_password_lookup') ?>"><i class="fa fa-lock fa-fw"></i> Change Password</a></li>
+                        <li><a href="<?= base_url('admin/configuration') ?>"><i class="fa fa-th fa-fw"></i> Configurations</a></li>
                         <li class="divider"></li>
-                         <li><a href="<?= site_url('admin/login/logout_lookup'); ?>"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        <li><a href="<?= site_url('admin/login/logout_lookup'); ?>"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         <!-- </li> -->
                     </ul>
                     <!-- /.dropdown-user -->

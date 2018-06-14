@@ -10,6 +10,7 @@ class Product_description extends PD_Photo {
 		$this->load->library('layouts');	
 		$this->load->model('admin/product_description_model');
 		$this->load->model('admin/product_model');
+        $this->load->model('admin/configuration_model');
 	}
 	public function index()
 	{
@@ -18,7 +19,7 @@ class Product_description extends PD_Photo {
 		$config = array();
         $config["base_url"] = base_url('admin/') . '/'  . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 	    $config["total_rows"] = $this->product_description_model->record_count();
-		$config['per_page'] = 5;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
         $config["uri_segment"] = 4;
 		$config["num_links"] = 1;
 		$config['full_tag_open'] = '<ul class="pagination">';

@@ -35,7 +35,7 @@
 			<div class="table-responsive">
 				<table class="table table-bordered table-striped table">
 					<col width="100">
-					<col width="65">
+					<col width="100">
 					<!-- <col width="250"> -->
 				    <thead>
 				    	<tr>

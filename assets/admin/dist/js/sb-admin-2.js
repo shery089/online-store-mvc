@@ -119,6 +119,18 @@ $(function() {
         createOrUpdateByAjax('edit_gallery_form', '/admin/gallery/product_pictures/' + path_parts[path_parts.length-2]);
     });
 
+    /**
+     * [description: Triggers when '#configuration_form' is submitted. Prevents normal form submission
+     * and calls createOrUpdateByAjax(); for ajax form submission]
+     */
+    $('#configuration_form').on('submit', function(e){
+        e.preventDefault();
+        createOrUpdateByAjax('configuration_form', '/admin/configuration/index/');
+    });
+
+    if($('#show_notification_hidden').val() == 1) {
+        $('#show_notification').attr('checked', true);
+    }
 
     /**
      * [description: Triggers when '#add_company_form' is submitted. Prevents normal form submission

@@ -8,6 +8,7 @@ class Company extends PD_Photo
 		parent::__construct();
 		$this->load->library('layouts');
 		$this->load->model('admin/company_model');
+        $this->load->model('admin/configuration_model');
 	}
 
 	public function index()
@@ -24,7 +25,7 @@ class Company extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = COMPANIES_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$data["companies"] = $this->fetch_companies_lookup($config["per_page"], $current_page);
@@ -528,7 +529,7 @@ class Company extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = COMPANIES_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$data["companies"] = $this->fetch_companies_lookup($config["per_page"], $current_page);

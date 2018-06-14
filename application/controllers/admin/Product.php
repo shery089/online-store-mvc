@@ -13,6 +13,7 @@ class Product extends PD_Photo {
 		$this->load->model('admin/company_model');
 		$this->load->model('admin/product_attribute_model');
 		$this->load->model('admin/product_attribute_detail_model');
+        $this->load->model('admin/configuration_model');
 	}
 	public function index()
 	{
@@ -28,7 +29,7 @@ class Product extends PD_Photo {
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = PRODUCTS_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$config["total_rows"] = $this->product_model->record_count();
@@ -634,7 +635,7 @@ class Product extends PD_Photo {
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = PRODUCTS_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$products = $this->fetch_products($config["per_page"], $current_page);

@@ -21,6 +21,7 @@ class User extends PD_Photo
 		$this->load->library('layouts');
 		$this->load->model('admin/user_model');
 		$this->load->model('admin/role_model');
+        $this->load->model('admin/configuration_model');
 	}
 
 	public function index()
@@ -37,7 +38,7 @@ class User extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = USERS_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$data["users"] = $this->fetch_users_lookup($config["per_page"], $current_page);
@@ -754,7 +755,7 @@ class User extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = USERS_PER_PAGE;
+		$config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$data["users"] = $this->fetch_users_lookup($config["per_page"], $current_page);
