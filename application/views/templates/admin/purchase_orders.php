@@ -156,8 +156,8 @@
                             <td><?= ucwords($purchase_order['purchase_price']); ?></td>
                             <td><?= ucwords($purchase_order['sale_price']); ?></td>
 				   			<td>
-				   				<a title="Edit Product" href="<?= base_url('admin/purchase_order/edit_purchase_order_lookup') . '/' . ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-alt"></span></a>
-<!--								<a title="Delete Product" href="javascript:void(0)" id="delete_--><?//= ucwords($purchase_order['id']); ?><!--" class="btn btn-sm btn-danger actions" style="display: inline-block;"><span class="fa fa-close"></span></a>-->
+				   				<a title="Edit Product" href="<?= base_url('admin/' . $entity . '/edit_' . $entity . '_lookup') . '/' . ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-success actions" style="display: inline-block;""><span class="fa fa-pencil-alt"></span></a>
+<!--								<a title="Delete Product" href="javascript:void(0)" id="delete_--><?//= ucwords($purchase_order['id']); ?><!--" class="btn btn-sm btn-danger actions" style="display: inline-block;"><span class="fa fa-window-close"></span></a>-->
 								<a title="Product Details" href="javascript:void(0)" id="view_<?= ucwords($purchase_order['id']); ?>" class="btn btn-sm btn-info actions" style="display: inline-block;"><span class="fa fa-eye "></span></a>
 							</td>
 				   		</tr>

@@ -52,7 +52,7 @@
          * @param $fields
          * @return bool
          */
-        public function get_configuration_by_id_lookup()
+        public function get_configuration_details_lookup()
         {
             $query = $this->db->get('`configuration`');
             if ($query->num_rows() > 0) {
@@ -63,7 +63,7 @@
         }
 
         /**
-         * Returns configurations from the database
+         * Returns items_per_page from the database
          * @param $id
          * @param $fields
          * @return bool
@@ -78,6 +78,26 @@
             if ($query->num_rows() > 0) {
                 $result = $query->result_array();
                 return array_pop($result)['items_per_page'];
+            }
+            return FALSE;
+        }
+
+        /**
+         * Returns items_per_page from the database
+         * @param $id
+         * @param $fields
+         * @return bool
+         */
+        public function get_minimum_products_notification()
+        {
+            $this->db->select('`value` AS `minimum_products_notification`');
+            $this->db->from('`configuration`');
+            $this->db->where('`config`', 'minimum_products_notification');
+            $query = $this->db->get('');
+
+            if ($query->num_rows() > 0) {
+                $result = $query->result_array();
+                return array_pop($result)['minimum_products_notification'];
             }
             return FALSE;
         }

@@ -3,7 +3,7 @@
         <div class="col-lg-12">
                 <!-- Form -->
             <?php //validation_errors(); ?>
-            <?= form_open_multipart('admin/purchase_order/edit_purchase_order_lookup/' . $purchase_order['id'], 'class=form id=edit_purchase_order_form novalidate'); ?>
+            <?= form_open_multipart('admin/' . $entity . '/edit_' . $entity . '_lookup/' . $purchase_order['id'], 'class=form id=edit_purchase_order_form novalidate'); ?>
             <h1 class="page-header text-center"><?= $layout_title ?></h1>
 
         <!-- Product -->

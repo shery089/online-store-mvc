@@ -151,7 +151,13 @@
          */
         public function record_count($params=array())
         {
+
+            if(isset($_POST['is_low_quantity_products'])) {
+                $params['product_quantity'] = $_POST['is_low_quantity_products'];
+            }
+
             $this->db->select('COUNT(`product_detail`.`id`) as total');
+
             $this->db->from('`product_detail`');
 
             if(isset($params['product_id'])) {
@@ -171,19 +177,19 @@
             if(isset($params['product_quantity'])) {
                 if(!empty($params['product_quantity'])) {
                     $this->db->where(array(
-                        '`product_detail`.`quantity` >= ' => $params['product_quantity'],
-                        '`product_detail`.`purchase_price` != ' => 0,
-                        '`product_detail`.`sale_price` != ' => 0
+                        '`product_detail`.`quantity` <= ' => $params['product_quantity'],
+//                        '`product_detail`.`purchase_price` != ' => 0,
+//                        '`product_detail`.`sale_price` != ' => 0
                     ));
                 }
-            }
+            }/*
             else {
                 $this->db->where(array(
                     '`product_detail`.`quantity` != ' => 0,
                     '`product_detail`.`purchase_price` != ' => 0,
                     '`product_detail`.`sale_price` != ' => 0
                 ));
-            }
+            }*/
 
             $query = $this->db->get();
             $result = $query->result_array();
@@ -199,6 +205,10 @@
          */
         public function fetch_purchase_orders($params = array())
         {
+            if(isset($_POST['is_low_quantity_products'])) {
+                $params['product_quantity'] = $_POST['is_low_quantity_products'];
+            }
+
             $this->db->select('`product_detail`.`id`, `product_detail`.`quantity`, `product_detail`.`purchase_price`, 
             `product_detail`.`sale_price`, `company`.`name` AS `company_name`, `product`.`name` AS `product_name`, 
             `product_attribute`.`name` AS `product_attribute_name`, `product_attribute_detail`.`name` AS product_attribute_value');
@@ -227,12 +237,12 @@
                     $this->db->where('`quantity` <= ', $params['product_quantity']);
                 }
             }
-
+/*
             $this->db->where(array(
                 '`quantity` != ' => 0,
                 '`purchase_price` != ' => 0,
                 '`sale_price` != ' => 0,
-            ));
+            ));*/
 
             $this->db->order_by('`product_detail`.`last_updated_on`', 'desc');
 

@@ -44,7 +44,9 @@
                                             <?php if(strpos($purchase_order['product_attribute_value'], '#') !== FALSE): ?>
                                                 <td style="background: <?= $purchase_order['product_attribute_value'] ?>"></td>
                                             <?php else: ?>
-                                                <?= ucwords($purchase_order['product_attribute_value']); ?>
+                                                <td>
+                                                    <?= ucwords($purchase_order['product_attribute_value']); ?>
+                                                </td>
                                             <?php endif; ?>
                                             <td><?= ucwords($purchase_order['quantity']); ?></td>
                                             <td><?= ucwords($purchase_order['purchase_price']); ?></td>

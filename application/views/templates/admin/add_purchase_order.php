@@ -160,7 +160,7 @@
         </div>
 
         <div class="col-lg-1">
-            <button data-id="1" id="delete_new_purchase_order_section_1" type="button" title="Remove Last Purchase Order" class="mar-top-27 btn btn-danger btn-circle hide"><i class="fa fa-close"></i></button>
+            <button data-id="1" id="delete_new_purchase_order_section_1" type="button" title="Remove Last Purchase Order" class="mar-top-27 btn btn-danger btn-circle hide"><i class="fa fa-window-close"></i></button>
         </div>
 
         </div> <!-- purchase_record_1 -->

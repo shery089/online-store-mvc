@@ -168,7 +168,7 @@
                 <img style="margin: 0 auto;" class="img img-responsive" src="<?= ADMIN_IMAGES_PATH . 'loader.gif' ?>" alt="">
             </div>
         <button id="add_new_product_attribute_section" type="button" title="Add New Product Attribute" class="btn btn-info btn-circle"><i class="fa fa-plus"></i></button>
-        <button id="delete_new_product_attribute_section" type="button" title="Remove Last Product Attribute" class="btn btn-danger btn-circle hide"><i class="fa fa-close"></i></button>
+        <button id="delete_new_product_attribute_section" type="button" title="Remove Last Product Attribute" class="btn btn-danger btn-circle hide"><i class="fa fa-window-close"></i></button>
         </div>
     </div>
 

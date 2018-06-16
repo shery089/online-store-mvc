@@ -76,7 +76,7 @@ class Configuration extends PD_Photo
                 echo json_encode($errors);
             } else {
 
-                $data['configurations'] = $this->configuration_model->get_configuration_by_id_lookup();
+                $data['configurations'] = $this->configuration_model->get_configuration_details_lookup();
 
                 $data['configurations'] = array_column($data['configurations'], 'value', 'config');
 
@@ -91,4 +91,9 @@ class Configuration extends PD_Photo
             }
         }
 	}
+
+	public function get_configuration_details_lookup() {
+	    echo json_encode($this->configuration_model->get_configuration_details_lookup());
+    }
+
 }

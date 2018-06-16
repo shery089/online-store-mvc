@@ -12,7 +12,7 @@
                             <a href="<?= site_url('admin/product_attribute'); ?>"><i class="fa fa-table fa-fw"></i> Product Attributes</a>
                         </li>
                         <li>
-                            <a href="<?= site_url('admin/product_attribute_detail'); ?>"><i class="fa fa-th fa-fw"></i> Product Attributes Details</a>
+                            <a href="<?= site_url('admin/product_attribute_detail'); ?>"><i class="fa fa-th fa-fw"></i> Product Attribute Details</a>
                         </li>
                         <li>
                             <a href="<?= site_url('admin/category'); ?>"><i class="fa fa-table fa-fw"></i> Category</a>

@@ -7,6 +7,7 @@ class Purchase_order extends PD_Photo
 	{
 		parent::__construct();
 		$this->load->library('layouts');
+        $this->load->model('admin/configuration_model');
 		$this->load->model('admin/purchase_order_model');
 		$this->load->model('admin/product_model');
         $this->load->model('admin/product_attribute_model');
@@ -28,11 +29,23 @@ class Purchase_order extends PD_Photo
 
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
+        if($this->uri->segment(2) == 'inventory') {
+            $data['entity'] = 'inventory';
+            $config["base_url"] = str_replace('purchase_order', 'inventory', $config["base_url"]);
+        }
+        else {
+            $data['entity'] = 'purchase_order';
+        }
 
-		$config['per_page'] = PURCHASE_ORDERS_PER_PAGE;
+        if($this->uri->segment(3)) {
+            $_POST['is_low_quantity_products'] = $this->configuration_model->get_minimum_products_notification();
+            $config["base_url"] = str_replace('index', 'low_quantity_products', $config["base_url"]);
+        }
+
+        $config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
-		$data["purchase_orders"] = $this->fetch_purchase_orders_lookup($config["per_page"], $current_page);
+        $data["purchase_orders"] = $this->fetch_purchase_orders_lookup($config["per_page"], $current_page, TRUE);
 		$config["total_rows"] = $this->purchase_order_model->record_count();
 
 		$config["num_links"] = 1;
@@ -154,14 +167,14 @@ class Purchase_order extends PD_Photo
 				$this->session->set_flashdata('success_message', 'Purchase Order has been successfully added!');
 				unset($_POST);
 				unset($_FILES);
-				echo json_encode(array('success' => 'Purchase_order inserted'));
+				echo json_encode(array('success' => 'Purchase Order inserted'));
 			}
 		}
 	}
 
 	/**
-	 * [edit_purchase_order_lookup: Edits a Purchase_order by id, Validates Purchase_order data. If data is valid then,
-	 * it allows access to its edit Purchase_order model function. Otherwise, It gives appropriate
+	 * [edit_purchase_order_lookup: Edits a Purchase Order by id, Validates Purchase Order data. If data is valid then,
+	 * it allows access to its edit Purchase Order model function. Otherwise, It gives appropriate
 	 * error messages. After data is successfully edited then, it gives a success flash
 	 * else wise error flash message]
 	 * @param  [type] $id [id to edit]
@@ -170,7 +183,11 @@ class Purchase_order extends PD_Photo
 	{
 		$this->unset_purchase_order_search_filter();
 
-		$this->layouts->set_title('Edit Purchase_order');
+        $title = $this->uri->segment(2) == 'inventory' ? 'Edit Inventory' : 'Edit Purchase Order';
+
+        $data['entity'] = $this->uri->segment(2) == 'inventory' ? 'inventory' : 'purchase_order';
+
+		$this->layouts->set_title($title);
 
 		/**
 		 * if its an ajax call then, set post data so
@@ -277,9 +294,9 @@ class Purchase_order extends PD_Photo
      * [edit_unique It's a callback function that is called in edit_purchase_order_lookup
      * validation it checks if same attribute data exists other than the current
      * current record than returns FALSE. If does not exists it returns TRUE]
-     * @param  [string] $value  [Purchase_order entered value e.g. in case of email validation
+     * @param  [string] $value  [Purchase Order entered value e.g. in case of email validation
      * sheryarahmed007@gmail.com]
-     * @param  [string] $params [table.attribute.id e.g. Purchase_order.email.3]
+     * @param  [string] $params [table.attribute.id e.g. Purchase Order.email.3]
      * @return [type]  [if same data exists other than current record then, returns
      * FALSE. If it doesn't exists other than current record then, returns TRUE.]
      */
@@ -302,50 +319,6 @@ class Purchase_order extends PD_Photo
         }
     }
 
-	/**
-	 * [current_password_match It's a callback function that is called in current_password_match
-	 * validation it checks if current password entered by the Purchase_order is same as DB password then returns TRUE
-	 * else returns FALSE]
-	 * @param  [string] $value  [Current Passoword value e.g. 123456]
-	 * @param  [string] $params [table.attribute.id e.g. Purchase_order.password.3]
-	 * @return [type]  [boolen]
-	 */
-	public function current_password_match($form_password, $params)
-	{
-		$this->unset_purchase_order_search_filter();
-
-		$current_purchase_order_id = array_column($this->session->userdata['admin_record'], 'id')[0];
-
-		$this->form_validation->set_message('current_password_match',
-				'%s is is wrong');
-		list($table, $field) = explode(".", $params);
-
-		$query = $this->db->select($field . ', salt')->from($table)
-				->where('id =', $current_purchase_order_id)->limit(1)->get();
-
-		$result = $query->result_array()[0];
-
-		$db_password = $result['password'];
-		$db_salt = $result['salt'];
-
-		$form_password = hash('sha512', $form_password . $db_salt);
-
-		if ($db_password === $form_password) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-
-	/**
-	 * [Purchase_order_lookup This function will retrieve all Purchase Orders from database without
-	 * pagination]
-	 * @return [array] [All Purchase_order records]
-	 */
-	public function Purchase_order_lookup()
-	{
-		$purchase_orders = $this->purchase_order_model->get_purchase_orders();
-		return $purchase_orders;
-	}
 
 	/**
 	 * [get_purchase_order_by_id_lookup This function will retrieve a specific Purchase_order from database
@@ -362,25 +335,6 @@ class Purchase_order extends PD_Photo
 		$this->unset_purchase_order_search_filter();
         $purchase_order = $this->purchase_order_model->get_purchase_order_by_id_lookup($id, $edit);
 		return $purchase_order;
-	}
-
-	public function product_id_autocomplete()
-	{
-		$product_company = trim(strtolower($this->input->post('product_id')));
-
-		$purchase_orders = $this->purchase_order_model->product_id_autocomplete($product_company);
-
-        $product_companys = array();
-
-		if(!empty($purchase_orders)) {
-			foreach($purchase_orders as $purchase_order) {
-                $product_companys[] = ucwords($purchase_order['product_company']);
-			}
-		} else {
-            $product_companys[] = 'No Results Found';
-		}
-
-		echo json_encode($product_companys);
 	}
 
 	/**
@@ -416,7 +370,7 @@ class Purchase_order extends PD_Photo
 		$config = array();
 		$config["base_url"] = base_url('admin/') . '/' . $this->router->fetch_class() . '/' . $this->router->fetch_method();
 
-		$config['per_page'] = PURCHASE_ORDERS_PER_PAGE;
+        $config['per_page'] = $this->configuration_model->get_items_per_page();
 		$config["uri_segment"] = URI_SEGMENT;
 
 		$data["purchase_orders"] = $this->fetch_purchase_orders_lookup($config["per_page"], $current_page);
@@ -449,7 +403,7 @@ class Purchase_order extends PD_Photo
 	 * @return mixed Purchase Orders JSON Object
 	 *
 	 */
-	public function fetch_purchase_orders_lookup($per_page, $current_page)
+	public function fetch_purchase_orders_lookup($per_page, $current_page, $is_low_quantity_products=TRUE)
 	{
 	    if(isset($_REQUEST['product_id'])) {
             $_POST['product_id'] = $_REQUEST['product_id'];

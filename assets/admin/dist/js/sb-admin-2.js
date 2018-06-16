@@ -81,6 +81,9 @@ $(function() {
     // adds active class to selected side bar li element
     $('#side-menu a[href="'+ active_half_url +'"]').parent().addClass('active');
 
+    // minimum products notification call
+    setInterval(fetchLowQuantityProductDetails,5000);
+
     /**
      * [description: closes the success and delete bootstrap alert with fade
      * and slideUp effect after 5 seconds
@@ -1648,6 +1651,18 @@ $(function() {
             getProductDetailOptions(id, product_attribute_id, selected_text, product_attribute_detail_values);
         }
     }
+
+    function fetchLowQuantityProductDetails(){
+        $.ajax({
+            url: base_url + "/admin/product/fetch_low_quantity_product_details/",
+            type: 'get',
+            success: function(response){
+                $('#notification_results').empty().html(response);
+                $('#notifications_count').html($('#low_quantity_product_count').val());
+            }
+        });
+    }
+
 });
 
 /*=====  End of document.ready comment block  ====== */

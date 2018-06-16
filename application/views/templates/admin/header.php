@@ -77,15 +77,17 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
                     <i class="fa fa-bell fa-fw"></i>
-                    <span class="badge"></span>
+                    <span class="badge badge-error" id="notifications_count"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-alerts">
+                    <ul class="dropdown-menu dropdown-alerts" id="notification_results">
                         <li>
-                        <a href="#"><div><i class="fa fa-comment fa-fw"></i>
-                            New Comment <span class="pull-right text-muted small">4 minutes ago</span></div>
-                        </a>
+                            <div class="col-lg-1">
+                                <i class="text-danger fa fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="col-lg-10">
+                                No Notifications!
+                            </div>
                         </li>
-                        <li class="divider"></li>
                     </ul>
                 <!-- /.dropdown-alerts -->
                 </li>

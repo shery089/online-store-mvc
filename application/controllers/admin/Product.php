@@ -57,7 +57,7 @@ class Product extends PD_Photo {
 		$data['companies'] = $this->company_model->get_companies_dropdown();
 
 		$data["links"] = $this->pagination->create_links();
-
+        
 		if(!$this->input->is_ajax_request()) {
 			$this->layouts->view('templates/admin/products', $data);
 		}
@@ -911,5 +911,28 @@ class Product extends PD_Photo {
                                                 $this->input->post('product_attribute')
                                             );
         $this->load->view('templates/admin/product_attribute_detail_purchase_dropdown', $data);
+    }
+
+    public function fetch_low_quantity_product_details() {
+
+        $configurations = $this->configuration_model->get_configuration_details_lookup();
+        $configurations = array_column($configurations, 'value', 'config');
+        if($configurations['show_notification']) {
+            if(is_numeric($configurations['minimum_products_notification'])) {
+                $configurations['per_page'] = $this->configuration_model->get_items_per_page();
+                $data['low_quantity_product_details'] = $this->product_model->fetch_low_quantity_product_details($configurations);
+                if(count($data['low_quantity_product_details']) > 0) {
+                    $data['low_quantity_product_count'] = $this->product_model->count_low_quantity_products($configurations);
+                }
+            }
+            else {
+                $data['minimum_products_notification'] = 'Minimum Products Notification is not numeric';
+            }
+        }
+        else {
+            $data['show_notification'] = 'Notifications are off!';
+        }
+
+        $this->load->view('templates/admin/low_quantity_products_notification_section', $data);
     }
 }

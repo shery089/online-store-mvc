@@ -590,4 +590,58 @@ class Product_model extends CI_Model {
         }
         return array();
     }
+
+    public function fetch_low_quantity_product_details($params=array()) {
+        $this->db->select('`product_detail`.`id`, `product_detail`.`quantity`, `product_detail`.`purchase_price`, 
+            `product_detail`.`sale_price`, `company`.`name` AS `company_name`, `product`.`name` AS `product_name`, 
+            `product_attribute`.`name` AS `product_attribute_name`, `product_attribute_detail`.`name` AS product_attribute_value');
+        $this->db->from('`product`');
+        $this->db->join('`company`', '`company`.`id` = `product`.`company`', 'left');
+        $this->db->join('`product_detail`', '`product_detail`.`product_id` = `product`.`id`', 'left');
+        $this->db->join('`product_attribute`', '`product_detail`.`product_attribute_detail_id` = `product_attribute`.`id`', 'left');
+        $this->db->join('`product_attribute_detail`', '`product_detail`.`product_attribute_detail_value` = `product_attribute_detail`.`id`', 'left');
+
+        $this->db->limit($params['per_page'], 0);
+//        $this->db->limit($params['per_page'], $params['current_page']);
+
+        if(isset($params['minimum_products_notification'])) {
+            if(!empty($params['minimum_products_notification'])) {
+                $this->db->where('`quantity` <= ', $params['minimum_products_notification']);
+            }
+        }
+
+        $this->db->order_by('`product_detail`.`quantity`', 'desc');
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0)
+        {
+            $result = $query->result_array();
+            return $result;
+        }
+
+        return false;
+    }
+
+    public function count_low_quantity_products($params=array()) {
+        $this->db->select('COUNT(`product_detail`.`id`) AS `count`');
+        $this->db->from('`product`');
+        $this->db->join('`company`', '`company`.`id` = `product`.`company`', 'left');
+        $this->db->join('`product_detail`', '`product_detail`.`product_id` = `product`.`id`', 'left');
+        $this->db->join('`product_attribute`', '`product_detail`.`product_attribute_detail_id` = `product_attribute`.`id`', 'left');
+        $this->db->join('`product_attribute_detail`', '`product_detail`.`product_attribute_detail_value` = `product_attribute_detail`.`id`', 'left');
+        if(isset($params['minimum_products_notification'])) {
+            if(!empty($params['minimum_products_notification'])) {
+                $this->db->where('`quantity` <= ', $params['minimum_products_notification']);
+            }
+        }
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0)
+        {
+            $result = $query->result_array();
+            return array_pop($result)['count'];
+        }
+
+        return false;
+    }
 }

@@ -149,7 +149,7 @@
 </div>
 
 <div class="col-lg-1">
-    <button data-id="<?= $this->input->post('id_prepend'); ?>" id="delete_new_purchase_order_section_<?= $this->input->post('id_prepend') ?>" type="button" title="Remove Last Purchase Order" class="btn btn-danger btn-circle mar-top-27 hide"><i class="fa fa-close"></i></button>
+    <button data-id="<?= $this->input->post('id_prepend'); ?>" id="delete_new_purchase_order_section_<?= $this->input->post('id_prepend') ?>" type="button" title="Remove Last Purchase Order" class="btn btn-danger btn-circle mar-top-27 hide"><i class="fa fa-window-close"></i></button>
 </div>
 
 </div><!-- purchase_record_$this->input->post('id_prepend') -->
