@@ -559,6 +559,30 @@ class Product_model extends CI_Model {
         return array();
     }
 
+    public function get_product_sales_price_and_quantity($product_id, $product_attr_id, $product_attr_val, $return_specific_key=FALSE,
+                    $specific_key='') {
+
+        if($return_specific_key) {
+            $this->db->select('`product_detail`.`' . $specific_key . '`');
+        }
+        else {
+            $this->db->select('`product_detail`.`quantity`, `product_detail`.`sale_price`');
+        }
+
+        $this->db->from('`product_detail`');
+        $this->db->where(array(
+                            '`product_detail`.`product_id`' => $product_id,
+                            '`product_detail`.`product_attribute_detail_id`' => $product_attr_id,
+                            '`product_detail`.`product_attribute_detail_value`' => $product_attr_val
+                        ));
+        $q = $this->db->get();
+        if($q->num_rows() > 0) {
+            $result = $q->result_array();
+            return $result[0];
+        }
+        return array();
+    }
+
     public function get_product_attr_name_by_id($product_attrs) {
         $formatted_product_attrs = array();
         foreach ($product_attrs as $product_attr) {
@@ -581,7 +605,6 @@ class Product_model extends CI_Model {
         $this->db->where(array('`product_detail`.`product_id`' => $product_id,
                                 '`product_detail`.`product_attribute_detail_id`' => $product_attr_id));
         $q = $this->db->get();
-        echo $this->db->last_query();
         if($q->num_rows() > 0) {
             $result = $q->result_array();
             $result = array_column($result, 'product_attribute_details');
@@ -643,5 +666,48 @@ class Product_model extends CI_Model {
         }
 
         return false;
+    }
+
+    public function get_product_quantity($product_id, $product_attribute_detail_id, $product_attribute_detail_value)
+    {
+        if (!empty($product_id) &&
+            !empty($product_attribute_detail_id) &&
+            !empty($product_attribute_detail_value)) {
+            $this->db->select('`product_detail`.`id` AS `product_detail_id`, `product_detail`.`quantity`');
+            $this->db->from('`product_detail`');
+            $this->db->where(array(
+                '`product_detail`.`product_id`' => $product_id,
+                '`product_detail`.`product_attribute_detail_id`' => $product_attribute_detail_id,
+                '`product_detail`.`product_attribute_detail_value`' => $product_attribute_detail_value
+            ));
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                $result = $query->row_array();
+                return $result;
+            }
+
+            return false;
+        }
+    }
+    public function get_product_details_by_pd_id($pd_id) {
+
+        if(!empty($pd_id)) {
+            $this->db->select('`product_detail`.`id` AS `product_detail_id`, `product`.`name` AS `product_name`, 
+            `product_attribute`.`name` AS `product_attribute_name`, `product_attribute_detail`.`name` AS `product_attribute_detail_name`');
+            $this->db->from('`product_detail`');
+            $this->db->join('`product`', '`product`.`id` = `product_detail`.`product_id`', 'left');
+            $this->db->join('`product_attribute`', '`product_attribute`.`id` = `product_detail`.`product_attribute_detail_id`', 'left');
+            $this->db->join('`product_attribute_detail`', '`product_attribute_detail`.`id` = `product_detail`.`product_attribute_detail_value`', 'left');
+            $this->db->where('`product_detail`.`id`', $pd_id);
+
+            $query = $this->db->get();
+            if ($query->num_rows() > 0) {
+                $result = $query->row_array();
+                return $result;
+            }
+
+            return false;
+
+        }
     }
 }

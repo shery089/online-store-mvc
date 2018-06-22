@@ -41,6 +41,8 @@ define('ADMIN_EXCEL_PATH', realpath(FCPATH  . 'assets/admin/excel/'));
 
 define('JSON_FILE_PATH', realpath(FCPATH  . 'assets/admin/json/'));
 
+define('LOGO', BASE_URL . 'assets/admin/images/logo/logo.jpg');
+
 /*
 |--------------------------------------------------------------------------
 | Locate ADMIN images 

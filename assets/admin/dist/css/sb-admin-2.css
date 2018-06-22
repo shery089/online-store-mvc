@@ -749,3 +749,12 @@ table.dataTable thead .sorting:after {
 .notifications-link:hover {
     background-color:transparent !important;
 }
+
+.success_prefix {
+    color: #5cb85c;
+    font-size: 10.5px;
+}
+
+.bold {
+    font-weight: bold;
+}

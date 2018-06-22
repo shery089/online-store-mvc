@@ -57,7 +57,7 @@ class Product extends PD_Photo {
 		$data['companies'] = $this->company_model->get_companies_dropdown();
 
 		$data["links"] = $this->pagination->create_links();
-        
+
 		if(!$this->input->is_ajax_request()) {
 			$this->layouts->view('templates/admin/products', $data);
 		}
@@ -886,9 +886,20 @@ class Product extends PD_Photo {
         $product_attrs = $this->product_model->get_product_specific_attributes($product_id);
         if(!empty($product_attrs)) {
             foreach ($product_attrs as $product_attr_key => $product_attr_val) {
-                $product_attrs_html .= '<option value="' . $product_attr_key . '">' . $product_attr_val . '</option>';
+                $product_attrs_html .= '<option value="' . $product_attr_key . '">' . ucwords($product_attr_val) . '</option>';
             }
             echo $product_attrs_html;
+        }
+    }
+
+    public function get_product_sales_price_and_quantity() {
+        $product_attrs_html = '';
+        $product_id = $this->input->post('product_id');
+        $product_attr_id = $this->input->post('product_attr_id');
+        $product_attr_val = $this->input->post('product_attr_val');
+        $product_price_and_quantity = $this->product_model->get_product_sales_price_and_quantity($product_id, $product_attr_id, $product_attr_val);
+        if(!empty($product_price_and_quantity)) {
+            echo json_encode($product_price_and_quantity);
         }
     }
 

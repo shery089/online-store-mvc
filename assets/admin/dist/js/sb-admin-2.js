@@ -81,8 +81,11 @@ $(function() {
     // adds active class to selected side bar li element
     $('#side-menu a[href="'+ active_half_url +'"]').parent().addClass('active');
 
-    // minimum products notification call
-    setInterval(fetchLowQuantityProductDetails,5000);
+    // check minimum products notification on page reload
+    fetchLowQuantityProductDetails();
+
+    // recheck minimum products notification after 10 seconds
+    setInterval(fetchLowQuantityProductDetails, 10000);
 
     /**
      * [description: closes the success and delete bootstrap alert with fade
@@ -220,6 +223,26 @@ $(function() {
     $('#edit_category_form').on('submit', function(e){
         e.preventDefault();
         createOrUpdateByAjax('edit_category_form', '/admin/category/');
+    });
+
+    /**
+     * [description: Triggers when '#add_sales_order_form' is submitted. Prevents normal form submission
+     * and calls createOrUpdateByAjax(); for ajax form submission]
+     */
+
+    $('#add_sales_order_form').on('submit', function(e){
+        e.preventDefault();
+        createOrUpdateByAjax('add_sales_order_form', '/admin/sales_order/');
+    });
+
+    /**
+     * [description: Triggers when '#edit_sales_order_form' is submitted. Prevents normal form submission
+     * and calls createOrUpdateByAjax(); for ajax form submission]
+     */
+
+    $('#edit_sales_order_form').on('submit', function(e){
+        e.preventDefault();
+        createOrUpdateByAjax('edit_sales_order_form', '/admin/sales_order/');
     });
 
     /**
@@ -502,6 +525,10 @@ $(function() {
                         {
                             $('#password, #confirm_password').val('');
                         }
+                        else if(index == 'error_message')
+                        {
+                            $('#global_error_message').html(error).parent().toggleClass('hide');
+                        }
                         index.length !== 0 ? $('#' + index + '_error').html(error) : $('#' + index + '_error').html('');
                     });
                 }
@@ -752,15 +779,41 @@ $(function() {
     }
 
     $(document).on('change', '[id^="product_"]', function() {
-        if($.inArray('purchase_order', path_parts) !== -1) {
+        if($.inArray('purchase_order', path_parts) !== -1 || $.inArray('sales_order', path_parts) !== -1) {
             $('[id^="product_attribute_"]').removeAttr('disabled');
             $('.selectpicker').selectpicker('refresh');
             var _this = $(this);
             var product_id = _this.val();
             var attr_id = _this.attr('id').split('_');
+            if($.inArray('sales_order', path_parts) !== -1) {
+                $('#quantity_' + attr_id[1] + '_error').removeClass('error_prefix success_prefix  text-right').empty();
+                $('#price_' + attr_id[1] + '_error').removeClass('error_prefix success_prefix text-right').empty();
+            }
+
             if($.isNumeric(attr_id[1])) {
                 var attr_id = _this.attr('id').split('_').pop();
                 getProductSpecificAttributes(product_id, attr_id);
+            }
+        }
+    });
+
+    $(document).on('change', '[id^="product_attr_details_"]', function() {
+        if($.inArray('sales_order', path_parts) !== -1) {
+            var _this = $(this);
+            var product_attr_details_id = _this.val();
+            var elem_attr_id_parts = _this.attr('id').split('_');
+            var elem_attr_id = elem_attr_id_parts[elem_attr_id_parts.length-1];
+            var product_id = $('#product_' + elem_attr_id).val();
+            var product_attribute_id = $('#product_attribute_' + elem_attr_id).val();
+
+            $('#quantity_' + elem_attr_id + '_error').removeClass('error_prefix success_prefix text-right').empty();
+            $('#price_' + elem_attr_id + '_error').removeClass('error_prefix success_prefix text-right').empty();
+
+            if(product_id && product_attribute_id && product_attr_details_id) {
+                $('#quantity_' + elem_attr_id).attr('disabled', true);
+                $('#price_' + elem_attr_id).attr('disabled', true);
+                getProductSalesPriceandQuantity(product_id, product_attribute_id, product_attr_details_id, elem_attr_id);
+
             }
         }
     });
@@ -808,9 +861,13 @@ $(function() {
             var product_attribute_id = _this.val();
             id = id.split('_');
             id = id.pop();
-            if($.inArray('purchase_order', path_parts) !== -1) {
+            if($.inArray('sales_order', path_parts) !== -1) {
+                $('#quantity_' + id + '_error').removeClass('error_prefix success_prefix text-right').empty();
+                $('#price_' + id + '_error').removeClass('error_prefix success_prefix text-right').empty();
+            }
+            if($.inArray('purchase_order', path_parts) !== -1 || $.inArray('sales_order', path_parts) !== -1) {
                 product_id = $('#product_' + id).val();
-                getProductDetailOptionsForPurchase(id, product_attribute_id, selected_text, '', product_id);
+                getProductDetailOptionsForSalesAndPurchase(id, product_attribute_id, selected_text, '', product_id);
             }
             else {
                 getProductDetailOptions(id, product_attribute_id, selected_text);
@@ -857,6 +914,23 @@ $(function() {
         }
     });
 
+    $('#add_new_sales_order_section').on('click', function(){
+        var last_inserted_id = getLastInsertedId();
+
+        var prod_attr_total = getProductAttributeChildrenCount(last_inserted_id);
+
+        last_inserted_id = parseInt(last_inserted_id) + 1; // +1 to have a unique id
+
+        addNewSalesOrderSection(last_inserted_id);
+
+        if($('[id^="sale_price_"]').length > 1) {
+            $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('style');
+        }
+        else {
+
+        }
+    });
+
     $('#delete_new_product_attribute_section').on('click', function(){
 
         $('#loader').show();
@@ -884,22 +958,52 @@ $(function() {
     });
 
     $(document).on('click', '[id^="delete_new_purchase_order_section_"]', function(){
-
         $('#loader').show();
         var _this = $(this);
         var id = _this.data('id');
         $('#purchase_record_' + id).fadeOut('slow', function () {
             $('#add_new_product_attribute_section').attr('disabled', true);
-            $('[id^="delete_new_purchase_order_section_"]').attr('disabled', true);
+            if($('[id^="sale_price_"]').length <= 4) {
+                $('[id^="delete_new_purchase_order_section_"]').attr('disabled', true);
+                $('[id^="delete_new_purchase_order_section_"]').hide();
+            }
+
+            if($('[id^="delete_new_purchase_order_section_"]').first().data('id') == id) {
+                var second_purchase_record_id = $('[id^="delete_new_purchase_order_section_"]').eq(1).data('id');
+                $('#purchase_record_' + second_purchase_record_id).removeAttr('style');
+            }
+
             $(this).remove();
         });
 
-        if($('[id^="sale_price_"]').length > 1) {
-            $('[id^="delete_new_purchase_order_section_"]').hide();
-        }
-
         $('#add_new_product_attribute_section').removeAttr('disabled');
         $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('disabled');
+        $('#loader').hide();
+
+    });
+
+    $(document).on('click', '[id^="delete_new_sales_order_section_"]', function(){
+        $('#loader').show();
+        var _this = $(this);
+        var id = _this.data('id');
+        $('#sales_record_' + id).fadeOut('slow', function () {
+            $('#add_new_product_attribute_section').attr('disabled', true);
+            if($('[id^="price_"]').length <= 4) {
+                $('[id^="delete_new_sales_order_section_"]').hide();
+                $('[id^="delete_new_sales_order_section_"]').attr('disabled', true);
+            }
+
+            if($('[id^="delete_new_sales_order_section_"]').first().data('id') == id) {
+                var second_sales_record_id = $('[id^="delete_new_sales_order_section_"]').eq(1).data('id');
+                $('#sales_record_' + second_sales_record_id).removeAttr('style');
+            }
+            
+            $(this).remove();
+            
+        });
+
+        $('#add_new_sales_order_section_1').removeAttr('disabled');
+        $('[id^="delete_new_sales_order_section_"]').removeClass('hide').removeAttr('disabled');
         $('#loader').hide();
 
     });
@@ -980,6 +1084,47 @@ $(function() {
             {
                 $('#product_attribute_' + attr_id).html(data);
                 $('.selectpicker').selectpicker('refresh');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of getProductSpecificAttributes block  ======*/
+
+    /*=============================================
+     =     getProductSalesPriceandQuantity block  =
+     =============================================*/
+
+    function getProductSalesPriceandQuantity(product_id, product_attr_id, product_attr_val, elem_id)
+    {
+        var data = {'product_id': product_id, 'product_attr_id': product_attr_id, 'product_attr_val': product_attr_val};
+        // calling ajax
+        $.ajax({
+            url: base_url + '/admin/product/get_product_sales_price_and_quantity',
+            method: 'post',
+            data: data,
+            success: function(data)
+            {
+                var data = $.parseJSON(data);
+                if(data.quantity == 0) {
+                    $('#quantity_' + elem_id + '_error').addClass('error_prefix text-right').html('Out of Stock!');
+                }
+                else {
+                    $('#quantity_' + elem_id + '_error').addClass('success_prefix text-right').html(data.quantity + ' available');
+                }
+                if(data.sale_price == 0) {
+                    $('#price_' + elem_id + '_error').addClass('error_prefix text-right').html('Price is not defined in Inventory!');
+                }
+                else {
+                    $('#price_' + elem_id).val(data.sale_price);
+                }
+
+                $('#quantity_' + elem_id).removeAttr('disabled');
+                $('#price_' + elem_id).removeAttr('disabled');
+
             },
             error: function()
             {
@@ -1291,7 +1436,7 @@ $(function() {
 
 
     /*=============================================
-     =            addNewProductAttributeSection comment block           =
+     = addNewProductAttributeSection comment block =
      =============================================*/
 
     function addNewPurchaseOrderSection(id_prepend)
@@ -1318,7 +1463,47 @@ $(function() {
                 $('.selectpicker').selectpicker('refresh');
                 $('#loader').hide();
                 $('#add_new_purchase_order_section').removeAttr('disabled');
-                $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('disabled');
+                $('[id^="delete_new_purchase_order_section_"]').removeClass('hide').removeAttr('disabled style');
+            },
+            error: function()
+            {
+                alert('Something went wrong!');
+            }
+        });
+    }
+
+    /*=====  End of addNewPurchaseOrderSection comment block  ======*/
+
+
+    /*=============================================
+     = addNewSalesOrderSection comment block =
+     =============================================*/
+
+    function addNewSalesOrderSection(id_prepend)
+    {
+        var options_arr = getSelectedSalesOrderAttributes();
+
+        var url = base_url + '/admin/sales_order/add_new_sales_order_section';
+
+        var data = {'id_prepend': id_prepend, 'options_arr': options_arr};
+        // calling ajax
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            beforeSend:function()
+            {
+                $('#loader').show();
+                $('#add_new_sales_order_section').attr('disabled', true);
+                $('[id^="delete_new_sales_order_section_"]').attr('disabled', true);
+            },
+            success: function(data)
+            {
+                $('#add_new_sales_order_section').parent().before(data);
+                $('.selectpicker').selectpicker('refresh');
+                $('#loader').hide();
+                $('#add_new_sales_order_section').removeAttr('disabled');
+                $('[id^="delete_new_sales_order_section_"]').removeClass('hide').removeAttr('disabled style');
             },
             error: function()
             {
@@ -1351,6 +1536,26 @@ $(function() {
     }
 
     function getSelectedPurchaseOrderAttributes() {
+
+        var selected_options = $('[id^="product_attribute_"] option:selected');// $(' option:selected');
+        var length = selected_options.length;
+        var options_arr = [];
+        for(var i=0; i < length; i++){
+            options_arr.push(selected_options.eq(i).text());
+        }
+
+        var index = options_arr.indexOf("Choose one or more...");
+
+        if (index != -1) {
+            options_arr.splice(index, 1);
+        }
+
+        options_arr = $.grep(options_arr, function(n){ return (n); });
+
+        return options_arr;
+    }
+
+    function getSelectedSalesOrderAttributes() {
 
         var selected_options = $('[id^="product_attribute_"] option:selected');// $(' option:selected');
         var length = selected_options.length;
@@ -1429,7 +1634,7 @@ $(function() {
      =  getProductDetailOptions comment block     =
      =============================================*/
 
-    function getProductDetailOptionsForPurchase(id, product_attribute, selected_text, product_attribute_detail_values, product_id)
+    function getProductDetailOptionsForSalesAndPurchase(id, product_attribute, selected_text, product_attribute_detail_values, product_id)
     {
         var url = base_url + '/admin/product/get_product_details_options_by_product_id';
 
@@ -1451,18 +1656,15 @@ $(function() {
                 $('select[id^="product_attribute_"] option:not(:selected)').removeAttr('disabled');
                 $('.selectpicker').selectpicker('refresh');
                 var options_arr = getSelectedProductAttributes();
-                for(var i= 0, length = options_arr.length; i < length; i++){
-                    $('#product_attribute_' + id + ' option:contains(' + ucWords(options_arr[i]) + ')').attr('disabled', true);
+                if($.inArray('purchase_order', path_parts) !== -1) {
+                    for(var i= 0, length = options_arr.length; i < length; i++){
+                        $('#product_attribute_' + id + ' option:contains(' + ucWords(options_arr[i]) + ')').attr('disabled', true);
+                    }
                 }
                 $('#product_attribute_' + id + ' .selectpicker').selectpicker('refresh');
 
                 $('#product_attr_details_' + id).empty();
                 $('#product_attr_details_' + id).append(data);
-                //$('#product_attr_details_' + id + ' .selectpicker').selectpicker('refresh');
-
-                //if($('#product_attr_details_' + id + ' option').length == 1) {
-                    //
-                //}
 
                 $('.selectpicker').selectpicker('refresh');
             },
@@ -1473,7 +1675,7 @@ $(function() {
         });
     }
 
-    /*=====  End of getProductDetailOptionsForPurchase comment block  ======*/
+    /*=====  End of getProductDetailOptionsForSalesAndPurchase comment block  ======*/
 
     /*=============================================
      =      imageIsLoaded comment block            =

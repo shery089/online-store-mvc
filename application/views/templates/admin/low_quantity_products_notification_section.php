@@ -1,8 +1,8 @@
 <?php ob_start(); ?>
-    <input type="hidden" id="low_quantity_product_count" value="<?= $low_quantity_product_count ?>">
 <?php if(!empty($low_quantity_product_details)): ?>
+    <input type="hidden" id="low_quantity_product_count" value="<?= $low_quantity_product_count ?>">
     <li>
-        <div style="font-size: 12px;padding: 5px;" class="text-center">You Have <span class="bold"><?= count($low_quantity_product_details) ?></span> New Notifications</div>
+        <div style="font-size: 12px;padding: 5px;" class="text-center">You Have <span class="bold"><?= $low_quantity_product_count ?></span> New Notifications</div>
         <div class="row">
             <div class="col-lg-12">
                 <div class="divider"></div>
@@ -48,41 +48,31 @@
             </a>
         </div>
     </li>
-    <?php else: ?>
+
+<div class="clearfix"></div>
+
+<?php elseif(isset($minimum_products_notification)): ?>
+    <div class="col-lg-1">
+        <i class="text-danger fa fa-exclamation-triangle"></i>
+    </div>
+    <div class="col-lg-10">
+        <?= $minimum_products_notification ?>
+    </div>
+
+<?php elseif(isset($show_notification)): ?>
+    <div class="col-lg-1">
+        <i class="text-danger fa fa-bell-slash"></i>
+    </div>
+    <div class="col-lg-10">
+        <?= $show_notification ?>
+    </div>
+
+<?php elseif(empty($low_quantity_product_details)): ?>
     <div class="col-lg-1">
         <i class="text-danger fa fa-exclamation-triangle"></i>
     </div>
     <div class="col-lg-10">
         No Notifications!
-    </div>
-<?php endif; ?>
-
-<div class="clearfix"></div>
-
-<?php if(isset($low_quantity_product_detail['minimum_products_notification'])): ?>
-    <div class="col-lg-1">
-        <i class="text-danger fa fa-exclamation-triangle"></i>
-    </div>
-    <div class="col-lg-10">
-        <?= $low_quantity_product_detail['minimum_products_notification'] ?>
-    </div>
-<?php endif; ?>
-
-<?php if(isset($low_quantity_product_detail['minimum_products_notification'])): ?>
-    <div class="col-lg-1">
-        <i class="text-danger fa fa-bell-slash"></i>
-    </div>
-    <div class="col-lg-10">
-        <?= $low_quantity_product_detail['minimum_products_notification'] ?>
-    </div>
-<?php endif; ?>
-
-<?php if(isset($low_quantity_product_detail['minimum_products_notification'])): ?>
-    <div class="col-lg-1">
-        <i class="text-danger fa fa-bell-slash"></i>
-    </div>
-    <div class="col-lg-10">
-        <?= $low_quantity_product_detail['minimum_products_notification'] ?>
     </div>
 <?php endif; ?>
 <?= ob_get_clean(); ?>
