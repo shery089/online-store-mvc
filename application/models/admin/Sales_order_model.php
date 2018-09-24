@@ -110,7 +110,9 @@
 
                         'price' => $this->price,
 
-                        'discount' => $this->discount
+                        'discount' => $this->discount,
+
+                        'created_date' => $this->created_date
 
                     );
 

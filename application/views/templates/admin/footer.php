@@ -35,7 +35,11 @@
 
     <script src="<?= ADMIN_ASSETS ?>pick-a-color/js/pick-a-color-1.2.3.min.js"></script>
 
-    <script src="<?= ADMIN_ASSETS ?>pick-a-color/js/tinycolor-0.9.15.min.js"></script>
+    <!-- Morris Charts JavaScript -->
+    <script src="<?= ADMIN_ASSETS ?>js/raphael.min.js"></script>
+    <script src="<?= ADMIN_ASSETS ?>js/morris.min.js"></script>
+    <script src="<?= ADMIN_ASSETS ?>dist/js/charts-data.js"></script>
+
 
     <footer class="text-center"> Inventory Management System Admin v1.0.0 &copy; <?= currentYear() == '2018' ? '2018' : '2018 - ' . currentYear(); ?> </footer>
 

@@ -633,7 +633,7 @@
         
         $.ajax({
 
-            url: base_url + 'statistics/get_top_ten_liked_politicians_lookup',
+            url: base_url + 'statistics/get_top_five_liked_politicians_lookup',
             method: 'post',
             cache: false,
             success: function(data)
@@ -767,7 +767,7 @@
         
         $.ajax({
 
-            url: base_url + 'statistics/get_top_ten_disliked_politicians_lookup',
+            url: base_url + 'statistics/get_top_five_disliked_politicians_lookup',
             method: 'post',
             cache: false,
             success: function(data)
@@ -833,7 +833,7 @@
         
         $.ajax({
 
-            url: base_url + 'statistics/get_top_ten_liked_political_parties_lookup',
+            url: base_url + 'statistics/get_top_five_liked_political_parties_lookup',
             method: 'post',
             cache: false,
             success: function(data)
@@ -899,7 +899,7 @@
         
         $.ajax({
 
-            url: base_url + 'statistics/get_top_ten_disliked_political_parties_lookup',
+            url: base_url + 'statistics/get_top_five_disliked_political_parties_lookup',
             method: 'post',
             cache: false,
             success: function(data)

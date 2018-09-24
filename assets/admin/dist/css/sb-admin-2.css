@@ -299,12 +299,7 @@ textarea
   transition: opacity 0.20s linear;
 }
 
-.fade.in 
-{
-  /*opacity: 1;*/
-}
-
-.error_prefix 
+.error_prefix
 {
     color: red !important;
     font-size: 10.5px;

@@ -51,6 +51,21 @@
                 <li>
                     <a href="<?= site_url('admin/configuration'); ?>"><i class="fa fa-th fa-fw"></i> Configurations</a>
                 </li>
+                <li>
+                    <a href="<?= site_url('admin/product_analysis'); ?>"><i class="fa fa-chart-bar fa-fw"></i> Product Analysis<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="<?= site_url('admin/user'); ?>"><i class="fa fa-user fa-fw"></i> Product at a Glance</a>
+                        </li>
+                        <li>
+                            <a href="<?= site_url('admin/product_analysis'); ?>"><i class="fa fa-sitemap fa-fw"></i> Overall Sales</a>
+                        </li>
+                        <li>
+                            <a href="<?= site_url('admin/role'); ?>"><i class="fa fa-sitemap fa-fw"></i> Product Specifics</a>
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

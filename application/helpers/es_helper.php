@@ -74,7 +74,27 @@ function custom_echo($arr, $col, $case_change = '') {
 }
 
 function in_array_r($item , $array){
-    return preg_match('/"'.$item.'"/i' , json_encode($array));
+    if(!empty($array)) {
+        return preg_match('/"'.$item.'"/i' , json_encode($array));
+    }
+    return FALSE;
+}
+
+function get_week_name($day_number){
+    if($day_number >= 1 && $day_number <= 7) {
+        $day_number = '1st Week';
+    }
+    elseif($day_number >= 8 && $day_number <= 14) {
+        $day_number = '2nd Week';
+    }
+    elseif($day_number >= 15 && $day_number <= 21) {
+        $day_number = '3rd Week';
+    }
+    elseif($day_number >= 22 && $day_number <= 28) {
+        $day_number = '4th Week';
+    }
+
+    return $day_number;
 }
 
 function get_partial_array_indices($array, $str, $start, $end){

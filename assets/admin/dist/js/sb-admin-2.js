@@ -24,7 +24,7 @@ $(function() {
     // http://localhost
 
     var path_parts = pathname.split('/');
-    var url_parts = path_parts[1] + '/' + path_parts[2] + '/'
+    var url_parts = path_parts[1] + '/' + path_parts[2] + '/';
     // ims/admin/user
 
     var active_half_url = origin + '/' + url_parts;
@@ -64,9 +64,6 @@ $(function() {
             break;
         }
     }
-
-    var active_half_url = origin + '/' + url_parts;
-    // http://localhost/admin/user
 
     // adds active class to selected page in bootstrap pagination
     $('ul.pagination').find('b').closest('li').addClass('active');
@@ -1656,13 +1653,13 @@ $(function() {
                 $('select[id^="product_attribute_"] option:not(:selected)').removeAttr('disabled');
                 $('.selectpicker').selectpicker('refresh');
                 var options_arr = getSelectedProductAttributes();
-                if($.inArray('purchase_order', path_parts) !== -1) {
+                /*if($.inArray('purchase_order', path_parts) !== -1) {
                     for(var i= 0, length = options_arr.length; i < length; i++){
                         $('#product_attribute_' + id + ' option:contains(' + ucWords(options_arr[i]) + ')').attr('disabled', true);
                     }
                 }
                 $('#product_attribute_' + id + ' .selectpicker').selectpicker('refresh');
-
+*/
                 $('#product_attr_details_' + id).empty();
                 $('#product_attr_details_' + id).append(data);
 
@@ -1864,6 +1861,29 @@ $(function() {
             }
         });
     }
+
+    var start_date = $('#start_date');
+    var end_date = $('#end_date');
+
+    start_date.datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd',
+        maxDate: todayDate(),
+        minDate: new Date(1970, 1, 1)
+    });
+
+    start_date.on('change', function () {
+        end_date.removeAttr('disabled').val('').datepicker("destroy");
+        end_date.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            maxDate: todayDate(),
+            minDate: $(this).val()
+        });
+
+    });
 
 });
 
